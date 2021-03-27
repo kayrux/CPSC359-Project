@@ -42,6 +42,7 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
 * @return: zero
 */
 int main() {
+    int run = 1;
     int buttons[16];
     for (int i = 0; i < 16; i ++) {
         buttons[i] = 1;
@@ -52,8 +53,9 @@ int main() {
     printf("Created by: Sherriff Kadiri and Surya Kusjanto\n");
     printf("Please press a button...\n");
 
-    while(1) {
+    while(run) {
         read_SNES(gpioPtr, buttons);
+        run = buttons[3];
     }
     return 0;
 }
