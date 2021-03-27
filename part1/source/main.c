@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <initGPIO.h>
 #include <snes.h>
+#include <pthread.h>
+#include <time.h>
+#include <stdlib.h>
 
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
 //#define INP_GPIO(g) *(gpioPtr+((g)/10)) &= ~(7<<(((g)%10)*3))
@@ -35,17 +38,49 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
     }
 }
 
+//A structure containing variables which are shared between all threads
+struct gameState {
+	int run;
+    int score;
+    int lives;
+    int win;
+    int lose;
+	int *buttons;
+    int **gameMap;
+	long time;
+} g;
 
 /*
-* Request the user input through text, initialize button array and run read_SNES.
+* Initializes the game state.
 * @param: none
+* @return: none
+*/
+void initGameState() {
+    g.win = 0;
+    g.lose = 0;
+    g.score = 0;
+    g.lives = 4;
+}
+
+/*
+* The game loop. Runs all the main processes.
+* @param *p: a filler arguement
 * @return: zero
 */
-int main() {
-    int run = 1;
-    int buttons[16];
+void *gameLoop(void *p) {
+    initGameState();
+    pthread_exit(NULL);
+}
+
+/*
+* The input loop. Continuously updates the buttons the user has pressed.
+* @param *p: a filler arguement
+* @return: zero
+*/
+void *input(void *p) {
+    g.buttons = malloc(16 * sizeof(int));
     for (int i = 0; i < 16; i ++) {
-        buttons[i] = 1;
+        g.buttons[i] = 1;
     }
 
     unsigned int *gpioPtr = getGPIOPtr();
@@ -53,9 +88,29 @@ int main() {
     printf("Created by: Sherriff Kadiri and Surya Kusjanto\n");
     printf("Please press a button...\n");
 
-    while(run) {
-        read_SNES(gpioPtr, buttons);
-        run = buttons[3];
+    while(g.run) {
+        read_SNES(gpioPtr, g.buttons);
+        g.run = g.buttons[3];
     }
+    pthread_exit(NULL);
+}
+
+/*
+* Request the user input through text, initialize button array and run read_SNES.
+* @param: none
+* @return: zero
+*/
+int main() {
+    pthread_t tidGameLoop;
+    pthread_t tidInput;
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	
+    g.run = 1;
+	pthread_create(&tidGameLoop, &attr, gameLoop, NULL);
+    pthread_create(&tidInput, &attr, input, NULL);
+	pthread_join(tidGameLoop, NULL);
+    pthread_join(tidInput, NULL);
+
     return 0;
 }
