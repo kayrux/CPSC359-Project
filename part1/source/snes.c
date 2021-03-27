@@ -34,17 +34,17 @@ void read_SNES(unsigned int *gpioPtr, int* oldButtons) {
         gpioPtr[GPSET0] = 1 << CLK;
     }
     print_message(newButtons, oldButtons);
+    wait(1000);
 }
 
 /*
-* Prints an appropriate button output
+* Stores button input and prints an appropriate button output
 * @param newButtons: the integer array of new Button input.
 * @param oldButtons: the integer array of old Button input.
 * @return: none.
 */
 void print_message(int* newButtons, int* oldButtons) {
     int btnPressed = 0;
-    
     if((newButtons[0] == 0) && (oldButtons[0] != newButtons[0])) {
         oldButtons[0] = newButtons[0];
         btnPressed = 1;
@@ -128,7 +128,7 @@ void print_message(int* newButtons, int* oldButtons) {
         printf("Button R Pressed\n");
     } else if ((newButtons[11] == 1) && (oldButtons[11] != newButtons[11])) {
         oldButtons[11] = 1;
-    }
+    } 
     if (btnPressed) printf("\nPlease press a button...\n\n");
 }
 
