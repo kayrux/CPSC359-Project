@@ -37,6 +37,17 @@ void read_SNES(unsigned int *gpioPtr, int* oldButtons) {
     wait(1000);
 }
 
+/* Checks if the button was pressed.
+* @param newBtn: the new button press.
+* @param oldBtn: the old button press.
+* @return: Returns 1 if the button was pressed. Returns 0 otherwise.
+*/
+int buttonPressed(int newBtn, int oldBtn) {
+    if ((newBtn == 0) && (oldBtn != newBtn)) {
+        return 1;
+    }
+    return 0;
+}
 /*
 * Stores button input and prints an appropriate button output
 * @param newButtons: the integer array of new Button input.

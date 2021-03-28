@@ -41,6 +41,7 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
 //A structure containing variables which are shared between all threads
 struct gameState {
 	int run;
+    int pause;
     int score;
     int lives;
     int win;
@@ -56,11 +57,17 @@ struct gameState {
 * @return: none
 */
 void initGameState() {
+    g.pause = 0;
     g.win = 0;
     g.lose = 0;
     g.score = 0;
     g.lives = 4;
+    g.buttons = malloc(16 * sizeof(int));
+    for (int i = 0; i < 16; i ++) {
+        g.buttons[i] = 1;
+    }
 }
+
 
 /*
 * The game loop. Runs all the main processes.
@@ -68,7 +75,10 @@ void initGameState() {
 * @return: zero
 */
 void *gameLoop(void *p) {
-    initGameState();
+        while (g.run == 1) {
+            while(g.pause == 1);
+
+        }
     pthread_exit(NULL);
 }
 
@@ -78,37 +88,63 @@ void *gameLoop(void *p) {
 * @return: zero
 */
 void *input(void *p) {
-    g.buttons = malloc(16 * sizeof(int));
-    for (int i = 0; i < 16; i ++) {
-        g.buttons[i] = 1;
-    }
-
     unsigned int *gpioPtr = getGPIOPtr();
 	printf("pointer address: %p\n", gpioPtr);
     printf("Created by: Sherriff Kadiri and Surya Kusjanto\n");
     printf("Please press a button...\n");
 
-    while(g.run) {
+    while(g.run == 1) {
         read_SNES(gpioPtr, g.buttons);
-        g.run = g.buttons[3];
+        g.pause = g.buttons[3];
     }
     pthread_exit(NULL);
 }
 
+
+void mainMenu() {
+    int startSelect = 1;                    // Begins with the start option selected.
+    int quitSelect = 0;
+    g.pause = 1;                            // Pause game
+    printf("Start: Selected\n");
+    while (g.pause == 1) {
+        if ((g.buttons[10] == 0) || (g.buttons[11] == 0)) {   // 'Up' or 'Down' button pressed
+            startSelect = 1 - startSelect;
+            quitSelect = 1 - quitSelect;
+            if (startSelect == 1) printf("Start Game: Selected\n");
+            else printf("Quit Game: Selected\n");
+            
+        }
+        if (g.buttons[8] == 0) {            // 'A' button pressed
+            if (startSelect == 1) {         // Start game
+                 g.pause = 0;
+                 printf("Game Start!!!!!\n");
+            } else {                        // Quit game
+                printf("Game Quit!!!!!\n");
+                g.run = 0;
+                g.pause = 0;
+            }
+        }  
+        wait(100000);
+    }
+}
 /*
 * Request the user input through text, initialize button array and run read_SNES.
 * @param: none
 * @return: zero
 */
 int main() {
+    initGameState();
+
     pthread_t tidGameLoop;
     pthread_t tidInput;
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
 	
+    pthread_create(&tidInput, &attr, input, NULL);          // Start input loop
     g.run = 1;
-	pthread_create(&tidGameLoop, &attr, gameLoop, NULL);
-    pthread_create(&tidInput, &attr, input, NULL);
+    mainMenu();                                             // Start Menu
+	pthread_create(&tidGameLoop, &attr, gameLoop, NULL);    // Game loop
+    
 	pthread_join(tidGameLoop, NULL);
     pthread_join(tidInput, NULL);
 
