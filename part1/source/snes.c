@@ -34,6 +34,7 @@ void read_SNES(unsigned int *gpioPtr, int* oldButtons) {
         gpioPtr[GPSET0] = 1 << CLK;
     }
     print_message(newButtons, oldButtons);
+    wait(10000);
 }
 
 /*
