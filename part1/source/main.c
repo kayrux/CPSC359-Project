@@ -10,6 +10,8 @@
 #include "alien.h"
 #include "test.h"
 #include "test3.h"
+#include "selectStart.h"
+#include "selectExit.h"
 #include "YOUR_IMAGE.h"
 #include <pthread.h>
 #include <time.h>
@@ -138,22 +140,22 @@ void *input(void *p) {
     /* initialize + get FBS */
 	framebufferstruct = initFbInfo();
 	
-	short int *alienPtr=(short int *) test3.pixel_data;
+	short int *alienPtr=(short int *) startImage.pixel_data;
 	
 	/* initialize a pixel */
 	Pixel *pixel;
 	float res = framebufferstruct.screenSize;
 	float length = framebufferstruct.lineLength;
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/(2);
+	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
 	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 	pixel = malloc(sizeof(Pixel));
 	int i=0;
 	//unsigned int quarter,byte,word;
-	for (int y = offsetY; y < 720 + offsetY; y++)//30 is the image height
+	for (int y = 0; y < 720; y++)//30 is the image height
 	{
-		for (int x = offsetX; x < 1280 + offsetX; x++) // 30 is image width
+		for (int x = offsetX-1280; x < 1280; x++) // 30 is image width
 		{	
 				pixel->color = alienPtr[i]; 
 				pixel->x = x;
@@ -182,6 +184,66 @@ void *input(void *p) {
     pthread_exit(NULL);
 }
 
+void mainMenuDrawStart() {
+	/* initialize + get FBS */
+	framebufferstruct = initFbInfo();
+	short int *alienPtr=(short int *) startImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	float res = framebufferstruct.screenSize;
+	float length = framebufferstruct.lineLength;
+	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
+	int offsetY = (width-720)/2;
+	int offsetX = (length-1280)/2;
+	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	pixel = malloc(sizeof(Pixel));
+	int i=0;
+	//unsigned int quarter,byte,word;
+	for (int y = 0; y < 720; y++) {						//30 is the image height 
+		for (int x = offsetX-1280; x < 1280; x++) {		// 30 is image width
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
+}
+
+void mainMenuDrawExit() {
+	/* initialize + get FBS */
+	framebufferstruct = initFbInfo();
+	short int *alienPtr=(short int *) exitImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	float res = framebufferstruct.screenSize;
+	float length = framebufferstruct.lineLength;
+	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
+	int offsetY = (width-720)/2;
+	int offsetX = (length-1280)/2;
+	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	pixel = malloc(sizeof(Pixel));
+	int i=0;
+	//unsigned int quarter,byte,word;
+	for (int y = 0; y < 720; y++) {						//30 is the image height 
+		for (int x = offsetX-1280; x < 1280; x++) {		// 30 is image width
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
+}
+
 
 void mainMenu() {
     int startSelect = 1;                    // Begins with the start option selected.
@@ -192,8 +254,13 @@ void mainMenu() {
         if ((getButtonPress(11) == 0) || (getButtonPress(10) == 0)) {   // 'Up' or 'Down' button pressed
             startSelect = 1 - startSelect;
             quitSelect = 1 - quitSelect;
-            if (startSelect == 1) printf("Start Game: Selected\n");
-            else printf("Quit Game: Selected\n");
+            if (startSelect == 1) {
+				printf("Start Game: Selected\n");
+				mainMenuDrawStart();
+			} else {
+				printf("Quit Game: Selected\n");
+				mainMenuDrawExit();
+			}
             
         }
         if (getButtonPress(8) == 0) {           // 'A' button pressed
@@ -208,6 +275,9 @@ void mainMenu() {
         }  
     }
 }
+
+
+
 /*
 * Request the user input through text, initialize button array and run read_SNES.
 * @param: none
