@@ -34,103 +34,114 @@ void read_SNES(unsigned int *gpioPtr, int* oldButtons) {
         gpioPtr[GPSET0] = 1 << CLK;
     }
     print_message(newButtons, oldButtons);
-    wait(10000);
+    wait(1000);
+}
+
+/* Checks if the button was pressed.
+* @param newBtn: the new button press.
+* @param oldBtn: the old button press.
+* @return: Returns 1 if the button was pressed. Returns 0 otherwise.
+*/
+int buttonPressed(int newBtn, int oldBtn) {
+    if ((newBtn == 0) && (oldBtn != newBtn)) {
+        return 1;
+    }
+    return 0;
 }
 
 /*
-* Prints an appropriate button output
+* Stores button input and prints an appropriate button output
 * @param newButtons: the integer array of new Button input.
 * @param oldButtons: the integer array of old Button input.
 * @return: none.
 */
 void print_message(int* newButtons, int* oldButtons) {
     int btnPressed = 0;
-    
     if((newButtons[0] == 0) && (oldButtons[0] != newButtons[0])) {
         oldButtons[0] = newButtons[0];
         btnPressed = 1;
-        printf("Button B Pressed\n");
+        //printf("Button B Pressed\n");
     } else if ((newButtons[0] == 1) && (oldButtons[0] != newButtons[0])) {
         oldButtons[0] = 1;
     }
     if((newButtons[1] == 0) && (oldButtons[1] != newButtons[1])) {
         oldButtons[1] = newButtons[1];
         btnPressed = 1;
-        printf("Button Y Pressed\n");
+        //printf("Button Y Pressed\n");
     }  else if ((newButtons[1] == 1) && (oldButtons[1] != newButtons[1])) {
         oldButtons[1] = 1;
     }
     if((newButtons[2] == 0) && (oldButtons[2] != newButtons[2])) {
         oldButtons[2] = newButtons[2];
         btnPressed = 1;
-        printf("Button SL Pressed\n");
+        //printf("Button SL Pressed\n");
     } else if ((newButtons[2] == 1) && (oldButtons[2] != newButtons[2])) {
         oldButtons[2] = 1;
     }
     if((newButtons[3] == 0) && (oldButtons[3] != newButtons[3])) {
         oldButtons[3] = newButtons[3];
         btnPressed = 1;
-        printf("Button ST Pressed\n");
+        //printf("Button ST Pressed\n");
     } else if ((newButtons[3] == 1) && (oldButtons[3] != newButtons[3])) {
         oldButtons[3] = 1;
     }
     if((newButtons[4] == 0) && (oldButtons[4] != newButtons[4])) {
         oldButtons[4] = newButtons[4];
         btnPressed = 1;
-        printf("Button UP Pressed\n");
+        //printf("Button UP Pressed\n");
     } else if ((newButtons[4] == 1) && (oldButtons[4] != newButtons[4])) {
         oldButtons[4] = 1;
     }
     if((newButtons[5] == 0) && (oldButtons[5] != newButtons[5])) {
         oldButtons[5] = newButtons[5];
         btnPressed = 1;
-        printf("Button DOWN Pressed\n");
+        //printf("Button DOWN Pressed\n");
     } else if ((newButtons[5] == 1) && (oldButtons[5] != newButtons[5])) {
         oldButtons[5] = 1;
     }
     if((newButtons[6] == 0) && (oldButtons[6] != newButtons[6])) {
         oldButtons[6] = newButtons[6];
         btnPressed = 1;
-        printf("Button LEFT Pressed\n");
+        //printf("Button LEFT Pressed\n");
     } else if ((newButtons[6] == 1) && (oldButtons[6] != newButtons[6])) {
         oldButtons[6] = 1;
     }
     if((newButtons[7] == 0) && (oldButtons[7] != newButtons[7])) {
         oldButtons[7] = newButtons[7];
         btnPressed = 1;
-        printf("Button RIGHT Pressed\n");
+        //printf("Button RIGHT Pressed\n");
     } else if ((newButtons[7] == 1) && (oldButtons[7] != newButtons[7])) {
         oldButtons[7] = 1;
     }
     if((newButtons[8] == 0) && (oldButtons[8] != newButtons[8])) {
         oldButtons[8] = newButtons[8];
         btnPressed = 1;
-        printf("Button A Pressed\n");
+        //printf("Button A Pressed\n");
     } else if ((newButtons[8] == 1) && (oldButtons[8] != newButtons[8])) {
         oldButtons[8] = 1;
     }
     if((newButtons[9] == 0) && (oldButtons[9] != newButtons[9])) {
         oldButtons[9] = newButtons[9];
         btnPressed = 1;
-        printf("Button X Pressed\n");
+        //printf("Button X Pressed\n");
     } else if ((newButtons[9] == 1) && (oldButtons[9] != newButtons[9])) {
         oldButtons[9] = 1;
     }
     if((newButtons[10] == 0) && (oldButtons[10] != newButtons[10])) {
         oldButtons[10] = newButtons[10];
         btnPressed = 1;
-        printf("Button L Pressed\n");
+        //printf("Button L Pressed\n");
     } else if ((newButtons[10] == 1) && (oldButtons[10] != newButtons[10])) {
         oldButtons[10] = 1;
     }
     if((newButtons[11] == 0) && (oldButtons[11] != newButtons[11])) {
         oldButtons[11] = newButtons[11];
         btnPressed = 1;
-        printf("Button R Pressed\n");
+        //printf("Button R Pressed\n");
     } else if ((newButtons[11] == 1) && (oldButtons[11] != newButtons[11])) {
         oldButtons[11] = 1;
-    }
-    if (btnPressed) printf("\nPlease press a button...\n\n");
+    } 
+    //if (btnPressed) printf("\nPlease press a button...\n\n");
 }
 
 /*
