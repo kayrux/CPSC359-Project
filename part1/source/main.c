@@ -12,6 +12,8 @@
 #include "test3.h"
 #include "selectStart.h"
 #include "selectExit.h"
+#include "levelOneLoad.h"
+#include "levelOnePlay.h"
 #include "YOUR_IMAGE.h"
 #include <pthread.h>
 #include <time.h>
@@ -244,6 +246,66 @@ void mainMenuDrawExit() {
 	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
 }
 
+void levelOneLoadDraw() {
+	/* initialize + get FBS */
+	framebufferstruct = initFbInfo();
+	short int *alienPtr=(short int *) levelOneImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	float res = framebufferstruct.screenSize;
+	float length = framebufferstruct.lineLength;
+	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
+	int offsetY = (width-720)/2;
+	int offsetX = (length-1280)/2;
+	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	pixel = malloc(sizeof(Pixel));
+	int i=0;
+	//unsigned int quarter,byte,word;
+	for (int y = 0; y < 720; y++) {						//30 is the image height 
+		for (int x = offsetX-1280; x < 1280; x++) {		// 30 is image width
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
+}
+
+void levelOnePlayDraw() {
+	/* initialize + get FBS */
+	framebufferstruct = initFbInfo();
+	short int *alienPtr=(short int *) levelOnePlayImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	float res = framebufferstruct.screenSize;
+	float length = framebufferstruct.lineLength;
+	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
+	int offsetY = (width-720)/2;
+	int offsetX = (length-1280)/2;
+	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	pixel = malloc(sizeof(Pixel));
+	int i=0;
+	//unsigned int quarter,byte,word;
+	for (int y = 0; y < 720; y++) {						//30 is the image height 
+		for (int x = offsetX-1280; x < 1280; x++) {		// 30 is image width
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
+}
+
 
 void mainMenu() {
     int startSelect = 1;                    // Begins with the start option selected.
@@ -265,8 +327,12 @@ void mainMenu() {
         }
         if (getButtonPress(8) == 0) {           // 'A' button pressed
             if (startSelect == 1) {             // Start game
-                 g.pause = 0;
-                 printf("Game Start!!!!!\n");
+                g.pause = 0;
+                printf("Game Start!!!!!\n");
+				sleep(2);
+				levelOneLoadDraw();
+				sleep(2);
+				levelOnePlayDraw();
             } else {                            // Quit game
                 printf("Game Quit!!!!!\n");
                 g.run = 0;
