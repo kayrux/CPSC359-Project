@@ -4,9 +4,13 @@
 #include <stdio.h>
 #include <initGPIO.h>
 #include <snes.h>
+#include <screen.h>
 #include <pthread.h>
 #include <time.h>
+#include "framebuffer.h"
 #include <stdlib.h>
+#include <sys/mman.h>
+
 
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
 //#define INP_GPIO(g) *(gpioPtr+((g)/10)) &= ~(7<<(((g)%10)*3))
@@ -71,6 +75,10 @@ void initGameState() {
     }
 }
 
+
+void render(struct fbs f) {
+    draw(f);
+}
 /*
 * Checks whether the button at the given index was pressed.
 * @param i: the index of the button.
@@ -93,7 +101,6 @@ int getButtonPress(int i) {
 void *gameLoop(void *p) {
         while (g.run == 1) {
             while(g.pause == 1);
-
         }
     pthread_exit(NULL);
 }
@@ -104,6 +111,7 @@ void *gameLoop(void *p) {
 * @return: zero
 */
 void *input(void *p) {
+    struct fbs framebufferstruct = initFbInfo();
     int oldButtons[16];
     for (int i = 0; i < 16; i ++) {
         oldButtons[i] = 1;
@@ -123,7 +131,10 @@ void *input(void *p) {
             }
             oldButtons[i] = g.buttons[i];
         }
+        render(framebufferstruct);
+        
     }
+    munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
     pthread_exit(NULL);
 }
 
