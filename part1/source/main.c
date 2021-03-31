@@ -116,14 +116,13 @@ void *input(void *p) {
     while(g.run == 1) {
         read_SNES(gpioPtr, g.buttons);
         for (int i = 0; i < 16; i ++) {
-            if ((oldButtons[i] == 1) && (g.buttons[i] == 0)) {
+            if ((oldButtons[i] == 1) && (g.buttons[i] == 0)) { // Button pressed.
                 g.buttonsPressed[i] = 0;
-            } else if ((oldButtons[i] == 0) && (g.buttons[i] == 1)) {
+            } else if ((oldButtons[i] == 0) && (g.buttons[i] == 1)) { // Button released.
                 g.buttonsPressed[i] = 1;
             }
             oldButtons[i] = g.buttons[i];
         }
-        g.pause = g.buttons[3];
     }
     pthread_exit(NULL);
 }
@@ -142,11 +141,11 @@ void mainMenu() {
             else printf("Quit Game: Selected\n");
             
         }
-        if (getButtonPress(8) == 0) {            // 'A' button pressed
-            if (startSelect == 1) {         // Start game
+        if (getButtonPress(8) == 0) {           // 'A' button pressed
+            if (startSelect == 1) {             // Start game
                  g.pause = 0;
                  printf("Game Start!!!!!\n");
-            } else {                        // Quit game
+            } else {                            // Quit game
                 printf("Game Quit!!!!!\n");
                 g.run = 0;
                 g.pause = 0;
@@ -170,7 +169,7 @@ int main() {
     pthread_create(&tidInput, &attr, input, NULL);          // Start input loop
     g.run = 1;
     mainMenu();                                             // Start Menu
-	pthread_create(&tidGameLoop, &attr, gameLoop, NULL);    // Game loop
+	pthread_create(&tidGameLoop, &attr, gameLoop, NULL);    // Game loop starts after player selects 'Start Game' in the start menu
     
 	pthread_join(tidGameLoop, NULL);
     pthread_join(tidInput, NULL);
