@@ -5,6 +5,9 @@
 #include <initGPIO.h>
 #include <snes.h>
 #include <screen.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include "framebuffer.h"
 #include <pthread.h>
 #include <time.h>
 #include "framebuffer.h"
@@ -150,13 +153,15 @@ void *gameLoop(void *p) {
 * @return: zero
 */
 void *input(void *p) {
-    framebufferstruct = initFbInfo();
     int oldButtons[16];
     for (int i = 0; i < 16; i ++) {
         oldButtons[i] = 1;
     }
     unsigned int *gpioPtr = getGPIOPtr();
 
+    /* initialize + get FBS */
+	framebufferstruct = initFbInfo();
+	drawStart();
     while(g.run == 1) {
         read_SNES(gpioPtr, g.buttons);
         for (int i = 0; i < 16; i ++) {
@@ -167,13 +172,12 @@ void *input(void *p) {
             }
             oldButtons[i] = g.buttons[i];
         }
-        render(framebufferstruct);
+        //render(framebufferstruct);
         
     }
     munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
     pthread_exit(NULL);
 }
-
 
 void mainMenu() {
     int startSelect = 1;                    // Begins with the start option selected.
@@ -184,14 +188,23 @@ void mainMenu() {
         if ((getButtonPress(4) == 0) || (getButtonPress(5) == 0)) {   // 'Up' or 'Down' button pressed
             startSelect = 1 - startSelect;
             quitSelect = 1 - quitSelect;
-            if (startSelect == 1) printf("Start Game: Selected\n");
-            else printf("Quit Game: Selected\n");
+            if (startSelect == 1) {
+				printf("Start Game: Selected\n");
+				mainMenuDrawStart();
+			} else {
+				printf("Quit Game: Selected\n");
+				mainMenuDrawExit();
+			}
             
         }
         if (getButtonPress(8) == 0) {           // 'A' button pressed
             if (startSelect == 1) {             // Start game
-                 g.pause = 0;
-                 printf("Game Start!!!!!\n");
+                g.pause = 0;
+                printf("Game Start!!!!!\n");
+				sleep(2);
+				levelOneLoadDraw();
+				sleep(2);
+				levelOnePlayDraw();
             } else {                            // Quit game
                 printf("Game Quit!!!!!\n");
                 g.run = 0;
@@ -200,6 +213,9 @@ void mainMenu() {
         }  
     }
 }
+
+
+
 /*
 * Request the user input through text, initialize button array and run read_SNES.
 * @param: none
