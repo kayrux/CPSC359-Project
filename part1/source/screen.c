@@ -79,7 +79,7 @@ void draw(struct fbs f, int xCellOff, int yCellOff) {
 }
 
 void drawStart() {
-	int *alienPtr=(int *) startImage.pixel_data;
+	short int *alienPtr=(short int *) startImage.pixel_data;
 	
 	/* initialize a pixel */
 	Pixel *pixel;

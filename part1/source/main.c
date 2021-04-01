@@ -104,7 +104,7 @@ void initGameState() {
 
 
 void render(struct fbs f) {
-    clear();
+    levelOnePlayDraw();
     draw(f, g.objects[0].xCellOff, g.objects[0].yCellOff);      //draw frog
 }
 
@@ -143,6 +143,7 @@ void *gameLoop(void *p) {
     while (g.run == 1) {
         while(g.pause == 1);
         updateFrog();
+		render(framebufferstruct);
     }
     pthread_exit(NULL);
 }
@@ -201,7 +202,7 @@ void mainMenu() {
             if (startSelect == 1) {             // Start game
                 g.pause = 0;
                 printf("Game Start!!!!!\n");
-				sleep(2);
+				sleep(1);
 				levelOneLoadDraw();
 				sleep(2);
 				levelOnePlayDraw();
