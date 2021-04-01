@@ -25,7 +25,9 @@
 #define	GPSET0	7           //write data line
 #define GPCLR0	10          //clear data line
 
-
+#define NUM_OBJECTS 20
+#define GAME_CELL_WIDTH 20
+#define GAME_CELL_HEIGHT 20
 /*
 * Initializes the given GPIO line based on the desired function
 * @param lineNum: the GPIO line to be initialized.
@@ -42,6 +44,15 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
     }
 }
 
+struct object {
+    int collidable;
+    int xCellOff;
+    int yCellOff;
+    int platform;
+    int active;
+    int id;
+};
+
 //A structure containing variables which are shared between all threads
 struct gameState {
 	int run;
@@ -52,10 +63,21 @@ struct gameState {
     int lose;
 	int *buttons;
     int *buttonsPressed;
+    struct object *objects;
     int **gameMap;
 	long time;
 } g;
 
+struct object initObject() {
+    struct object o;
+    o.collidable = 0;
+    o.xCellOff = 0;
+    o.yCellOff = 0;
+    o.platform = 0;
+    o.active = 0;
+    o.id = 0;
+    return o;
+}
 /*
 * Initializes the game state.
 * @param: none
@@ -69,7 +91,9 @@ void initGameState() {
     g.lives = 4;
     g.buttons = malloc(16 * sizeof(int));
     g.buttonsPressed = malloc(16 * sizeof(int));
+    g.objects = malloc(16 * sizeof(struct object));
     for (int i = 0; i < 16; i ++) {
+        g.objects[i] = initObject();
         g.buttons[i] = 1;
         g.buttonsPressed[i] = 1;
     }
@@ -77,8 +101,10 @@ void initGameState() {
 
 
 void render(struct fbs f) {
-    draw(f);
+    clear();
+    draw(f, g.objects[0].xCellOff, g.objects[0].yCellOff);      //draw frog
 }
+
 /*
 * Checks whether the button at the given index was pressed.
 * @param i: the index of the button.
@@ -92,6 +118,17 @@ int getButtonPress(int i) {
     return 1;
 }
 
+/*
+* Updates the frog's position based on the arrow buttons.
+* @param: none
+* @return: none
+*/
+void updateFrog() {
+    if (getButtonPress(4) == 0) g.objects[0].yCellOff -= 1;         // UP
+    else if (getButtonPress(5) == 0) g.objects[0].yCellOff += 1;    // DOWN
+    else if (getButtonPress(6) == 0) g.objects[0].xCellOff -= 1;    // LEFT
+    else if (getButtonPress(7) == 0) g.objects[0].xCellOff += 1;    // RIGHT
+}
 
 /*
 * The game loop. Runs all the main processes.
@@ -99,9 +136,11 @@ int getButtonPress(int i) {
 * @return: zero
 */
 void *gameLoop(void *p) {
-        while (g.run == 1) {
-            while(g.pause == 1);
-        }
+    printf("Game start...\n");
+    while (g.run == 1) {
+        while(g.pause == 1);
+        updateFrog();
+    }
     pthread_exit(NULL);
 }
 
@@ -111,15 +150,12 @@ void *gameLoop(void *p) {
 * @return: zero
 */
 void *input(void *p) {
-    struct fbs framebufferstruct = initFbInfo();
+    framebufferstruct = initFbInfo();
     int oldButtons[16];
     for (int i = 0; i < 16; i ++) {
         oldButtons[i] = 1;
     }
     unsigned int *gpioPtr = getGPIOPtr();
-	/*printf("pointer address: %p\n", gpioPtr);
-    printf("Created by: Sherriff Kadiri and Surya Kusjanto\n");
-    printf("Please press a button...\n");*/
 
     while(g.run == 1) {
         read_SNES(gpioPtr, g.buttons);
@@ -145,7 +181,7 @@ void mainMenu() {
     g.pause = 1;                            // Pause game
     printf("Start: Selected\n");
     while (g.pause == 1) {
-        if ((getButtonPress(11) == 0) || (getButtonPress(10) == 0)) {   // 'Up' or 'Down' button pressed
+        if ((getButtonPress(4) == 0) || (getButtonPress(5) == 0)) {   // 'Up' or 'Down' button pressed
             startSelect = 1 - startSelect;
             quitSelect = 1 - quitSelect;
             if (startSelect == 1) printf("Start Game: Selected\n");
