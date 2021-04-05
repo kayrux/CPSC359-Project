@@ -29,8 +29,12 @@
 #define GPCLR0	10          //clear data line
 
 #define NUM_OBJECTS 20
-#define GAME_CELL_WIDTH 20
-#define GAME_CELL_HEIGHT 20
+#define GAME_GRID_WIDTH 40
+#define GAME_GRID_HEIGHT 20
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
+
+
 /*
 * Initializes the given GPIO line based on the desired function
 * @param lineNum: the GPIO line to be initialized.
@@ -54,6 +58,7 @@ struct object {
     int platform;
     int active;
     int id;
+    int direction;
 };
 
 //A structure containing variables which are shared between all threads
@@ -79,6 +84,7 @@ struct object initObject() {
     o.platform = 0;
     o.active = 0;
     o.id = 0;
+    o.direction = 0;
     return o;
 }
 /*
@@ -103,9 +109,9 @@ void initGameState() {
 }
 
 
-void render(struct fbs f) {
+void render() {
     levelOnePlayDraw();
-    draw(f, g.objects[0].xCellOff, g.objects[0].yCellOff);      //draw frog
+    draw(g.objects[0].xCellOff, g.objects[0].yCellOff);      //draw frog
 }
 
 /*
@@ -127,10 +133,10 @@ int getButtonPress(int i) {
 * @return: none
 */
 void updateFrog() {
-    if (getButtonPress(4) == 0) g.objects[0].yCellOff -= 1;         // UP
-    else if (getButtonPress(5) == 0) g.objects[0].yCellOff += 1;    // DOWN
-    else if (getButtonPress(6) == 0) g.objects[0].xCellOff -= 1;    // LEFT
-    else if (getButtonPress(7) == 0) g.objects[0].xCellOff += 1;    // RIGHT
+    if ((getButtonPress(4) == 0) && (g.objects[0].yCellOff > 0)) g.objects[0].yCellOff -= 1;                              // UP
+    else if ((getButtonPress(5) == 0) && ((g.objects[0].yCellOff + 1) < GAME_GRID_HEIGHT)) g.objects[0].yCellOff += 1;    // DOWN
+    else if ((getButtonPress(6) == 0) && (g.objects[0].xCellOff > 0)) g.objects[0].xCellOff -= 1;                         // LEFT
+    else if ((getButtonPress(7) == 0) && ((g.objects[0].xCellOff + 1) < GAME_GRID_WIDTH)) g.objects[0].xCellOff += 1;     // RIGHT
 }
 
 /*
@@ -143,7 +149,7 @@ void *gameLoop(void *p) {
     while (g.run == 1) {
         while(g.pause == 1);
         updateFrog();
-		render(framebufferstruct);
+		render();
     }
     pthread_exit(NULL);
 }
@@ -173,7 +179,6 @@ void *input(void *p) {
             }
             oldButtons[i] = g.buttons[i];
         }
-        //render(framebufferstruct);
         
     }
     munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
