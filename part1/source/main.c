@@ -13,6 +13,7 @@
 #include "framebuffer.h"
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <gameObject.h>
 
 
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
@@ -28,7 +29,7 @@
 #define	GPSET0	7           //write data line
 #define GPCLR0	10          //clear data line
 
-#define NUM_OBJECTS 20
+#define NUM_OBJECTS 16
 #define GAME_GRID_WIDTH 40
 #define GAME_GRID_HEIGHT 20
 #define SCREEN_WIDTH 1280
@@ -51,18 +52,9 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
     }
 }
 
-struct object {
-    int collidable;
-    int xCellOff;
-    int yCellOff;
-    int platform;
-    int active;
-    int id;
-    int direction;
-};
 
 //A structure containing variables which are shared between all threads
-struct gameState {
+/* struct gameState {
 	int run;
     int pause;
     int score;
@@ -74,17 +66,21 @@ struct gameState {
     struct object *objects;
     int **gameMap;
 	long time;
-} g;
+} g; */
+struct gameState g;
 
 struct object initObject() {
     struct object o;
-    o.collidable = 0;
-    o.xCellOff = 0;
-    o.yCellOff = 0;
-    o.platform = 0;
-    o.active = 0;
-    o.id = 0;
-    o.direction = 0;
+    o.collidable = 0;           // 0 = not collidable. 1 = collidable 
+    o.xStart = 0;               // Used for objects partway through the screen
+    o.xCellOff = 0;             // X cell position of object
+    o.yCellOff = 0;             // Y Cell position of object
+    o.xOffset = 0;              // X pixel position of object
+    o.yOffset = 0;              // Y pixel position of object
+    o.platform = 0;             // 0 = not a platform. 1 = platform
+    o.active = 0;               // 0 = not active. 1 = active
+    o.id = 0;                   // [frog, Car3RightBaseClear]
+    o.direction = 0;            // 0 = left. 1 = right. 2 = up. 3 = down.
     return o;
 }
 
@@ -103,17 +99,26 @@ void initGameState() {
     g.buttonsPressed = malloc(16 * sizeof(int));
     g.objects = malloc(16 * sizeof(struct object));
     for (int i = 0; i < 16; i ++) {
-        g.objects[i] = initObject();
         g.buttons[i] = 1;
         g.buttonsPressed[i] = 1;
     }
+    for (int i = 0; i < NUM_OBJECTS; i++) {
+        g.objects[i] = initObject();
+    }
 }
 
+void renderObject(struct object *o) {
+    drawCar1(o->xCellOff, o->yCellOff, o->xOffset, o->xStart);
+}
 
 void render() {
-    levelOnePlayDraw();                                             // Level One Background    
+    //levelOnePlayDraw();                                             // Level One Background
+    for (int i = 0; i < NUM_OBJECTS; i ++) {
+        if (g.objects[i].active == 1) renderObject(&g.objects[i]);  // render Object based on id
+    }    
     drawFrog(g.objects[0].xCellOff, g.objects[0].yCellOff);         // Draw frog
 }
+
 
 /*
 * Checks whether the button at the given index was pressed.
@@ -147,10 +152,16 @@ void updateFrog() {
 */
 void *gameLoop(void *p) {
     printf("Game start...\n");
+    // TEST CODE
+    g.objects[1].active = 1;
+    g.objects[1].direction = 1;
+    // END TEST
     while (g.run == 1) {
         while(g.pause == 1);
+        updateObjects(&g);
         updateFrog();
 		render();
+        wait(1000);
     }
     pthread_exit(NULL);
 }
