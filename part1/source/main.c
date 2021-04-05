@@ -87,6 +87,7 @@ struct object initObject() {
     o.direction = 0;
     return o;
 }
+
 /*
 * Initializes the game state.
 * @param: none
@@ -110,8 +111,8 @@ void initGameState() {
 
 
 void render() {
-    levelOnePlayDraw();
-    draw(g.objects[0].xCellOff, g.objects[0].yCellOff);      //draw frog
+    levelOnePlayDraw();                                             // Level One Background    
+    drawFrog(g.objects[0].xCellOff, g.objects[0].yCellOff);         // Draw frog
 }
 
 /*

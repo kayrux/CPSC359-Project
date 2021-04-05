@@ -2,15 +2,16 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <framebuffer.h>
-#include <res/alien.h>
 #include <res/selectStart.h>
 #include <res/selectExit.h>
 #include <res/levelOneLoad.h>
 #include <res/levelOnePlay.h>
+#include <res/FrogUpBase.h>
 
 #define X_CELL_PIXEL_SCALE 32
 #define Y_CELL_PIXEL_SCALE 32
-
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 // RESOLUTION: 1280x720
 
 /* Definitions */
@@ -27,17 +28,16 @@ void clear() {
 	pixel = malloc(sizeof(Pixel));
 	int i=0;
 	//unsigned int quarter,byte,word;
-	for (int y = 0; y < 720; y++)//30 is the image height
+	for (int y = 0; y < 720; y++)
 	{
-		for (int x = 0; x < 1280; x++) // 30 is image width
+		for (int x = 0; x < 1280; x++)
 		{	
 				pixel->color = 256; 
 				pixel->x = x;
 				pixel->y = y;
 	
 				drawPixel(pixel);
-				i++;
-				
+				i++;			
 		}
 	}
 	/* free pixel's allocated memory */
@@ -46,21 +46,17 @@ void clear() {
 }
 
 
-void draw(int xCellOff, int yCellOff) {
-/* initialize + get FBS */
-	//framebufferstruct = initFbInfo();
-    //framebufferstruct = f;
-	
-	int *alienPtr=(int *) alienImage.image_pixels;
+void drawFrog(int xCellOff, int yCellOff) {
+	short int *alienPtr=(short int *) ImageFrogUpBase.pixel_data;
 	
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
 	int i=0;
-	//unsigned int quarter,byte,word;
-	for (int y = 0; y < 30; y++)//30 is the image height
+
+	for (int y = 0; y < ImageFrogUpBase.height; y++)
 	{
-		for (int x = 0; x < 30; x++) // 30 is image width
+		for (int x = 0; x < ImageFrogUpBase.width; x++)
 		{	
 				pixel->color = alienPtr[i]; 
 				pixel->x = x + (xCellOff * X_CELL_PIXEL_SCALE);
@@ -82,19 +78,18 @@ void drawStart() {
 	
 	/* initialize a pixel */
 	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+
 	float res = framebufferstruct.screenSize;
 	float length = framebufferstruct.lineLength;
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
 	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
-	pixel = malloc(sizeof(Pixel));
+
 	int i=0;
-	//unsigned int quarter,byte,word;
-	for (int y = 0; y < 720; y++)//30 is the image height
-	{
-		for (int x = 0; x < 1280; x++) // 30 is image width
-		{	
+	for (int y = 0; y < 720; y++) {
+		for (int x = 0; x < 1280; x++) {	
 				pixel->color = alienPtr[i]; 
 				pixel->x = x;
 				pixel->y = y;
@@ -113,17 +108,18 @@ void mainMenuDrawStart() {
 	short int *alienPtr=(short int *) startImage.pixel_data;
 	/* initialize a pixel */
 	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+
 	float res = framebufferstruct.screenSize;
 	float length = framebufferstruct.lineLength;
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
 	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
-	pixel = malloc(sizeof(Pixel));
+
 	int i=0;
-	//unsigned int quarter,byte,word;
-	for (int y = 0; y < 720; y++) {						//30 is the image height 
-		for (int x = 0; x < 1280; x++) {		// 30 is image width
+	for (int y = 0; y < 720; y++) { 
+		for (int x = 0; x < 1280; x++) {
 			pixel->color = alienPtr[i]; 
 			pixel->x = x;
 			pixel->y = y;
@@ -140,17 +136,18 @@ void mainMenuDrawExit() {
 	short int *alienPtr=(short int *) exitImage.pixel_data;
 	/* initialize a pixel */
 	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+
 	float res = framebufferstruct.screenSize;
 	float length = framebufferstruct.lineLength;
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
 	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
-	pixel = malloc(sizeof(Pixel));
+
 	int i=0;
-	//unsigned int quarter,byte,word;
-	for (int y = 0; y < 720; y++) {						//30 is the image height 
-		for (int x = 0; x < 1280; x++) {		// 30 is image width
+	for (int y = 0; y < 720; y++) { 
+		for (int x = 0; x < 1280; x++) {
 			pixel->color = alienPtr[i]; 
 			pixel->x = x;
 			pixel->y = y;
@@ -167,17 +164,18 @@ void levelOneLoadDraw() {
 	short int *alienPtr=(short int *) levelOneImage.pixel_data;
 	/* initialize a pixel */
 	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+
 	float res = framebufferstruct.screenSize;
 	float length = framebufferstruct.lineLength;
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
 	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
-	pixel = malloc(sizeof(Pixel));
+	
 	int i=0;
-	//unsigned int quarter,byte,word;
-	for (int y = 0; y < 720; y++) {						//30 is the image height 
-		for (int x = 0; x < 1280; x++) {		// 30 is image width
+	for (int y = 0; y < 720; y++) { 
+		for (int x = 0; x < 1280; x++) {
 			pixel->color = alienPtr[i]; 
 			pixel->x = x;
 			pixel->y = y;
@@ -194,17 +192,18 @@ void levelOnePlayDraw() {
 	short int *alienPtr=(short int *) levelOnePlayImage.pixel_data;
 	/* initialize a pixel */
 	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+
 	float res = framebufferstruct.screenSize;
 	float length = framebufferstruct.lineLength;
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
 	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
-	pixel = malloc(sizeof(Pixel));
+	
 	int i=0;
-	//unsigned int quarter,byte,word;
-	for (int y = 0; y < 720; y++) {						//30 is the image height 
-		for (int x = 0; x < 1280; x++) {		// 30 is image width
+	for (int y = 0; y < 720; y++) {
+		for (int x = 0; x < 1280; x++) {
 			pixel->color = alienPtr[i]; 
 			pixel->x = x;
 			pixel->y = y;
