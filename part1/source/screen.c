@@ -3,16 +3,15 @@
 #include <sys/mman.h>
 #include <framebuffer.h>
 #include <res/alien.h>
-#include <res/test.h>
-#include <res/test3.h>
 #include <res/selectStart.h>
 #include <res/selectExit.h>
 #include <res/levelOneLoad.h>
 #include <res/levelOnePlay.h>
-#include <res/YOUR_IMAGE.h>
 
-#define X_CELL_PIXEL_SCALE 40
-#define Y_CELL_PIXEL_SCALE 40
+#define X_CELL_PIXEL_SCALE 32
+#define Y_CELL_PIXEL_SCALE 32
+
+// RESOLUTION: 1280x720
 
 /* Definitions */
 typedef struct {
@@ -47,10 +46,10 @@ void clear() {
 }
 
 
-void draw(struct fbs f, int xCellOff, int yCellOff) {
+void draw(int xCellOff, int yCellOff) {
 /* initialize + get FBS */
 	//framebufferstruct = initFbInfo();
-    framebufferstruct = f;
+    //framebufferstruct = f;
 	
 	int *alienPtr=(int *) alienImage.image_pixels;
 	
