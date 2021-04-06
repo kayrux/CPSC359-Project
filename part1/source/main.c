@@ -105,18 +105,20 @@ void initGameState() {
     for (int i = 0; i < NUM_OBJECTS; i++) {
         g.objects[i] = initObject();
     }
+    g.fBuffer = malloc(1280 * 720 * 2);
 }
 
 void renderObject(struct object *o) {
-    drawCar1(o->xCellOff, o->yCellOff, o->xOffset, o->xStart);
+    drawCar1(o->xCellOff, o->yCellOff, o->xOffset, o->xStart, g.fBuffer);
 }
 
 void render() {
-    //levelOnePlayDraw();                                             // Level One Background
+    levelOnePlayDraw(g.fBuffer);                                             // Level One Background
     for (int i = 0; i < NUM_OBJECTS; i ++) {
         if (g.objects[i].active == 1) renderObject(&g.objects[i]);  // render Object based on id
     }    
-    drawFrog(g.objects[0].xCellOff, g.objects[0].yCellOff);         // Draw frog
+    drawFrog(g.objects[0].xCellOff, g.objects[0].yCellOff, g.fBuffer);         // Draw frog
+    renderScreen(g.fBuffer);
 }
 
 
@@ -145,6 +147,10 @@ void updateFrog() {
     else if ((getButtonPress(7) == 0) && ((g.objects[0].xCellOff + 1) < GAME_GRID_WIDTH)) g.objects[0].xCellOff += 1;     // RIGHT
 }
 
+void update() {
+    updateObjects(&g);
+    updateFrog();
+}
 /*
 * The game loop. Runs all the main processes.
 * @param *p: a filler arguement
@@ -152,16 +158,16 @@ void updateFrog() {
 */
 void *gameLoop(void *p) {
     printf("Game start...\n");
+
     // TEST CODE
     g.objects[1].active = 1;
     g.objects[1].direction = 1;
     // END TEST
     while (g.run == 1) {
         while(g.pause == 1);
-        updateObjects(&g);
-        updateFrog();
+        update();
 		render();
-        wait(1000);
+        //wait(1000);
     }
     pthread_exit(NULL);
 }
@@ -222,7 +228,7 @@ void mainMenu() {
 				sleep(1);
 				levelOneLoadDraw();
 				sleep(2);
-				levelOnePlayDraw();
+				levelOnePlayDraw(g.fBuffer);
             } else {                            // Quit game
                 printf("Game Quit!!!!!\n");
                 g.run = 0;

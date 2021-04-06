@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <framebuffer.h>
+#include <string.h>
 
 // res folder
 #include <res/selectStart.h>
@@ -23,6 +24,7 @@ typedef struct {
 	int x, y;
 } Pixel;
 
+
 int outOfBounds(int xOffset) {
 	if (xOffset > SCREEN_WIDTH) return 1;
 	return 0;
@@ -30,6 +32,7 @@ int outOfBounds(int xOffset) {
 
 struct fbs framebufferstruct;
 void drawPixel(Pixel *pixel);
+void writePixel(Pixel *pixel, char *fBuffer);
 
 void clear() {
 	Pixel *pixel;
@@ -53,7 +56,7 @@ void clear() {
 	pixel = NULL;
 }
 
-void drawFrog(int xCellOff, int yCellOff) {
+void drawFrog(int xCellOff, int yCellOff, char *fBuffer) {
 	short int *alienPtr=(short int *) ImageFrogUpBase.pixel_data;
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
@@ -65,7 +68,7 @@ void drawFrog(int xCellOff, int yCellOff) {
 				pixel->x = x + (xCellOff * X_CELL_PIXEL_SCALE);
 				pixel->y = y + (yCellOff * Y_CELL_PIXEL_SCALE);
 	
-				drawPixel(pixel);
+				writePixel(pixel, fBuffer);
 				i++;	
 		}
 	}
@@ -73,7 +76,7 @@ void drawFrog(int xCellOff, int yCellOff) {
 	pixel = NULL;
 }
 
-void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart) {
+void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer) {
 	short int *imagePtr=(short int *) ImageCar3RightBaseClear.pixel_data;
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
@@ -86,7 +89,7 @@ void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart) {
 				pixel->x = x + xOffset;
 				pixel->y = y + (yCellOff * Y_CELL_PIXEL_SCALE);
 				
-				drawPixel(pixel);
+				writePixel(pixel, fBuffer);
 				i++;	
 		}
 	}
@@ -106,7 +109,7 @@ void drawStart() {
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
-	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 
 	int i=0;
 	for (int y = 0; y < 720; y++) {
@@ -136,7 +139,7 @@ void mainMenuDrawStart() {
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
-	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 
 	int i=0;
 	for (int y = 0; y < 720; y++) { 
@@ -164,7 +167,7 @@ void mainMenuDrawExit() {
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
-	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 
 	int i=0;
 	for (int y = 0; y < 720; y++) { 
@@ -192,7 +195,7 @@ void levelOneLoadDraw() {
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
-	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 	
 	int i=0;
 	for (int y = 0; y < 720; y++) { 
@@ -209,7 +212,7 @@ void levelOneLoadDraw() {
 	pixel = NULL;
 }
 
-void levelOnePlayDraw() {
+void levelOnePlayDraw(char *fBuffer) {
 	short int *alienPtr=(short int *) levelOnePlayImage.pixel_data;
 	/* initialize a pixel */
 	Pixel *pixel;
@@ -220,7 +223,7 @@ void levelOnePlayDraw() {
 	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
 	int offsetY = (width-720)/2;
 	int offsetX = (length-1280)/2;
-	printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 	
 	int i=0;
 	for (int y = 0; y < 720; y++) {
@@ -228,7 +231,7 @@ void levelOnePlayDraw() {
 			pixel->color = alienPtr[i]; 
 			pixel->x = x;
 			pixel->y = y;
-			drawPixel(pixel);
+			writePixel(pixel, fBuffer);
 			i++;
 		}
 	}
@@ -237,9 +240,20 @@ void levelOnePlayDraw() {
 	pixel = NULL;
 }
 
+
+void writePixel(Pixel *pixel, char *fBuffer) {
+	long int location =(pixel->x +framebufferstruct.xOff) * (framebufferstruct.bits/8) +
+                       (pixel->y+framebufferstruct.yOff) * framebufferstruct.lineLength;
+	*((unsigned short int*)(fBuffer + location)) = pixel->color;
+}
+
 /* Draw a pixel */
-void drawPixel(Pixel *pixel){
+void drawPixel(Pixel *pixel) {
 	long int location =(pixel->x +framebufferstruct.xOff) * (framebufferstruct.bits/8) +
                        (pixel->y+framebufferstruct.yOff) * framebufferstruct.lineLength;
 	*((unsigned short int*)(framebufferstruct.fptr + location)) = pixel->color;
+}
+
+void renderScreen(char *fBuffer) {
+	memcpy(framebufferstruct.fptr, fBuffer, 1280 * 720 * 2);
 }

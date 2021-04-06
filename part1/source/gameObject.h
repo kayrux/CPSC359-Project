@@ -27,6 +27,7 @@ struct gameState {
     struct object *objects;
     int **gameMap;
 	long time;
+    char* fBuffer;
 };
 
 //void renderObject(struct object *o);
