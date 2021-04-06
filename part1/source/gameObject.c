@@ -19,6 +19,7 @@ struct object {
     int active;
     int id;
     int direction;
+    int speed;
 };
 
 //A structure containing variables which are shared between all threads
@@ -47,12 +48,12 @@ void updateObjects(struct gameState *g) {
         {
             if (g->objects[i].direction == 0)
             {
-                g->objects[i].xOffset -= 1;
+                g->objects[i].xOffset -= g->objects[i].speed;
                 if (g->objects[i].xOffset < 0)
                 {
-                    g->objects[i].xOffset = 0;
-                    g->objects[i].xStart++;
-                    if (g->objects[i].xStart == 32)
+                    //g->objects[i].xOffset = 0;
+                    g->objects[i].xStart += g->objects[i].speed;
+                    if (g->objects[i].xStart >= 32)
                     {
                         g->objects[i].xStart = 0;
                         g->objects[i].active = 0;
@@ -61,7 +62,7 @@ void updateObjects(struct gameState *g) {
             }
             else
             {
-                g->objects[i].xOffset += 1;
+                g->objects[i].xOffset += g->objects[i].speed;
                 if (g->objects[i].xOffset > SCREEN_WIDTH)
                 {
                     g->objects[i].xOffset = SCREEN_WIDTH;
@@ -74,17 +75,17 @@ void updateObjects(struct gameState *g) {
 
 void updateLocation(struct object *o) {
     if (o->direction == 0) {
-        o->xOffset -= 1;
+        o->xOffset -= o->speed;
         if (o->xOffset < 0) {
-            o->xOffset = 0;
-            o->xStart ++;
+            //o->xOffset = 0;
+            o->xStart += o->speed;
             if (o->xStart == 32) {
                 o->xStart = 0;
                 o->active = 0;
             }
         }
     } else {
-        o->xOffset += 1;
+        o->xOffset += o->speed;
         if (o->xOffset > SCREEN_WIDTH) {
             o->xOffset = SCREEN_WIDTH;
             o->active = 0;

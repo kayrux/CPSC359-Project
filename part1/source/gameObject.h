@@ -12,6 +12,7 @@ struct object {
     int active;
     int id;
     int direction;
+    int speed;
 };
 
 //A structure containing variables which are shared between all threads

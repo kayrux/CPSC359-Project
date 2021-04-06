@@ -84,13 +84,15 @@ void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer
 	int i = (yCellOff * SCREEN_WIDTH) + xStart;							// Accounts for images partway off the screen
 	for (int y = 0; y < ImageCar3RightBaseClear.height; y++) {
 		for (int x = 0; x < ImageCar3RightBaseClear.width; x++) {	
-			if (outOfBounds(x + xOffset) == 1) break;
+			if ((outOfBounds(x + xOffset) != 1) || (xStart == 0)) { 
 				pixel->color = imagePtr[i];
 				pixel->x = x + xOffset;
 				pixel->y = y + (yCellOff * Y_CELL_PIXEL_SCALE);
-				
 				writePixel(pixel, fBuffer);
-				i++;	
+			}	
+				
+			i++;
+
 		}
 	}
 	free(pixel);

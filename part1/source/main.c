@@ -81,6 +81,7 @@ struct object initObject() {
     o.active = 0;               // 0 = not active. 1 = active
     o.id = 0;                   // [frog, Car3RightBaseClear]
     o.direction = 0;            // 0 = left. 1 = right. 2 = up. 3 = down.
+    o.speed = 3;                // Speed of the object
     return o;
 }
 
@@ -161,7 +162,8 @@ void *gameLoop(void *p) {
 
     // TEST CODE
     g.objects[1].active = 1;
-    g.objects[1].direction = 1;
+    g.objects[1].direction = 0;
+    g.objects[1].xOffset = SCREEN_WIDTH;
     // END TEST
     while (g.run == 1) {
         while(g.pause == 1);
