@@ -17,8 +17,8 @@ void drawStart();
 void mainMenuDrawStart();
 void mainMenuDrawExit();
 void levelOneLoadDraw();
-void levelOnePlayDraw(char *fBuffer);
+void levelOnePlayDraw(char *gameMap);
 
-void renderScreen(char *fBuffer);
+void renderScreen(char *gameMap);
 
 #endif
