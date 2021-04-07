@@ -39,10 +39,8 @@ void clear() {
 	pixel = malloc(sizeof(Pixel));
 	int i=0;
 	//unsigned int quarter,byte,word;
-	for (int y = 0; y < 720; y++)
-	{
-		for (int x = 0; x < 1280; x++)
-		{	
+	for (int y = 0; y < 720; y++) {
+		for (int x = 0; x < 1280; x++) {	
 				pixel->color = 256; 
 				pixel->x = x;
 				pixel->y = y;
@@ -114,6 +112,7 @@ void drawStart() {
 	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 
 	int i=0;
+	printf("Work 1\n");
 	for (int y = 0; y < 720; y++) {
 		for (int x = 0; x < 1280; x++) {	
 				pixel->color = alienPtr[i]; 
@@ -191,14 +190,7 @@ void levelOneLoadDraw() {
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
 	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
-	
 	int i=0;
 	for (int y = 0; y < 720; y++) { 
 		for (int x = 0; x < 1280; x++) {
@@ -219,12 +211,6 @@ void levelOnePlayDraw(char *fBuffer) {
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
 	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 	
 	int i=0;
