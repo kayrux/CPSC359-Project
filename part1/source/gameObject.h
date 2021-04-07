@@ -8,6 +8,8 @@ struct object {
     int yCellOff;
     int xOffset;
     int yOffset;
+    int width;
+    int height;
     int platform;
     int active;
     int id;
@@ -26,13 +28,17 @@ struct gameState {
 	int *buttons;
     int *buttonsPressed;
     struct object *objects;
-    int **gameMap;
 	long time;
-    char* fBuffer;
+    char* gameMap;
 };
 
 //void renderObject(struct object *o);
+struct object initObject();
+struct object initFrog();
+void updateFrogLocation(int buttonPress, struct gameState *g);
 void updateObjects(struct gameState *g);
+void setObjects(int level, struct gameState *g);
+int checkCollision(struct object *o, struct object *frog);
 //void updateLocation(struct object *o);
 
 #endif

@@ -26,7 +26,7 @@ typedef struct {
 
 
 int outOfBounds(int xOffset) {
-	if (xOffset > SCREEN_WIDTH) return 1;
+	if ((xOffset > SCREEN_WIDTH) || (xOffset < 0)) return 1;
 	return 0;
 }
 
@@ -54,7 +54,7 @@ void clear() {
 	pixel = NULL;
 }
 
-void drawFrog(int xCellOff, int yCellOff, char *fBuffer) {
+void drawFrog(int xOffset, int yCellOff, char *fBuffer) {
 	short int *alienPtr=(short int *) ImageFrogUpBase.pixel_data;
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
@@ -63,7 +63,7 @@ void drawFrog(int xCellOff, int yCellOff, char *fBuffer) {
 	for (int y = 0; y < ImageFrogUpBase.height; y++) {
 		for (int x = 0; x < ImageFrogUpBase.width; x++) {	
 				pixel->color = alienPtr[i]; 
-				pixel->x = x + (xCellOff * X_CELL_PIXEL_SCALE);
+				pixel->x = x + xOffset;
 				pixel->y = y + (yCellOff * Y_CELL_PIXEL_SCALE);
 	
 				writePixel(pixel, fBuffer);
@@ -78,11 +78,11 @@ void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer
 	short int *imagePtr=(short int *) ImageCar3RightBaseClear.pixel_data;
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-	
-	int i = (yCellOff * SCREEN_WIDTH) + xStart;							// Accounts for images partway off the screen
+	if (xOffset < 0) xOffset = 0;
+	int i = 0;							// Accounts for images partway off the screen
 	for (int y = 0; y < ImageCar3RightBaseClear.height; y++) {
 		for (int x = 0; x < ImageCar3RightBaseClear.width; x++) {	
-			if ((outOfBounds(x + xOffset) != 1) || (xStart == 0)) { 
+			if ((outOfBounds(x + xOffset) != 1)) { 
 				pixel->color = imagePtr[i];
 				pixel->x = x + xOffset;
 				pixel->y = y + (yCellOff * Y_CELL_PIXEL_SCALE);
