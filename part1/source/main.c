@@ -52,38 +52,7 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
     }
 }
 
-
-//A structure containing variables which are shared between all threads
-/* struct gameState {
-	int run;
-    int pause;
-    int score;
-    int lives;
-    int win;
-    int lose;
-	int *buttons;
-    int *buttonsPressed;
-    struct object *objects;
-    int **gameMap;
-	long time;
-} g; */
 struct gameState g;
-
-struct object initObject() {
-    struct object o;
-    o.collidable = 0;           // 0 = not collidable. 1 = collidable 
-    o.xStart = 0;               // Used for objects partway through the screen
-    o.xCellOff = 0;             // X cell position of object
-    o.yCellOff = 0;             // Y Cell position of object
-    o.xOffset = 0;              // X pixel position of object
-    o.yOffset = 0;              // Y pixel position of object
-    o.platform = 0;             // 0 = not a platform. 1 = platform
-    o.active = 0;               // 0 = not active. 1 = active
-    o.id = 0;                   // [frog, Car3RightBaseClear]
-    o.direction = 0;            // 0 = left. 1 = right. 2 = up. 3 = down.
-    o.speed = 3;                // Speed of the object
-    return o;
-}
 
 /*
 * Initializes the game state.
@@ -98,28 +67,29 @@ void initGameState() {
     g.lives = 4;
     g.buttons = malloc(16 * sizeof(int));
     g.buttonsPressed = malloc(16 * sizeof(int));
-    g.objects = malloc(16 * sizeof(struct object));
+    g.objects = malloc(NUM_OBJECTS * sizeof(struct object));
     for (int i = 0; i < 16; i ++) {
         g.buttons[i] = 1;
         g.buttonsPressed[i] = 1;
     }
-    for (int i = 0; i < NUM_OBJECTS; i++) {
+    g.objects[0] = initFrog();
+    for (int i = 1; i < NUM_OBJECTS; i++) {
         g.objects[i] = initObject();
     }
-    g.fBuffer = malloc(1280 * 720 * 2);
+    g.gameMap = malloc(1280 * 720 * 2);
 }
 
 void renderObject(struct object *o) {
-    drawCar1(o->xCellOff, o->yCellOff, o->xOffset, o->xStart, g.fBuffer);
+    drawCar1(o->xCellOff, o->yCellOff, o->xOffset, o->xStart, g.gameMap);
 }
 
 void render() {
-    levelOnePlayDraw(g.fBuffer);                                             // Level One Background
-    for (int i = 0; i < NUM_OBJECTS; i ++) {
+    levelOnePlayDraw(g.gameMap);                                             // Level One Background
+    for (int i = 1; i < NUM_OBJECTS; i ++) {
         if (g.objects[i].active == 1) renderObject(&g.objects[i]);  // render Object based on id
     }    
-    drawFrog(g.objects[0].xCellOff, g.objects[0].yCellOff, g.fBuffer);         // Draw frog
-    renderScreen(g.fBuffer);
+    drawFrog(g.objects[0].xOffset, g.objects[0].yCellOff, g.gameMap);         // Draw frog
+    renderScreen(g.gameMap);
 }
 
 
@@ -142,16 +112,17 @@ int getButtonPress(int i) {
 * @return: none
 */
 void updateFrog() {
-    if ((getButtonPress(4) == 0) && (g.objects[0].yCellOff > 0)) g.objects[0].yCellOff -= 1;                              // UP
-    else if ((getButtonPress(5) == 0) && ((g.objects[0].yCellOff + 1) < GAME_GRID_HEIGHT)) g.objects[0].yCellOff += 1;    // DOWN
-    else if ((getButtonPress(6) == 0) && (g.objects[0].xCellOff > 0)) g.objects[0].xCellOff -= 1;                         // LEFT
-    else if ((getButtonPress(7) == 0) && ((g.objects[0].xCellOff + 1) < GAME_GRID_WIDTH)) g.objects[0].xCellOff += 1;     // RIGHT
+    if (getButtonPress(4) == 0) updateFrogLocation(0, &g);         // UP
+    else if (getButtonPress(5) == 0) updateFrogLocation(1, &g);    // DOWN
+    else if (getButtonPress(6) == 0) updateFrogLocation(2, &g);    // LEFT
+    else if (getButtonPress(7) == 0) updateFrogLocation(3, &g);    // RIGHT
 }
 
 void update() {
     updateObjects(&g);
     updateFrog();
 }
+
 /*
 * The game loop. Runs all the main processes.
 * @param *p: a filler arguement
@@ -161,9 +132,7 @@ void *gameLoop(void *p) {
     printf("Game start...\n");
 
     // TEST CODE
-    g.objects[1].active = 1;
-    g.objects[1].direction = 0;
-    g.objects[1].xOffset = SCREEN_WIDTH;
+    setObjects(1, &g);
     // END TEST
     while (g.run == 1) {
         while(g.pause == 1);
@@ -230,7 +199,7 @@ void mainMenu() {
 				sleep(1);
 				levelOneLoadDraw();
 				sleep(2);
-				levelOnePlayDraw(g.fBuffer);
+				levelOnePlayDraw(g.gameMap);
             } else {                            // Quit game
                 printf("Game Quit!!!!!\n");
                 g.run = 0;
