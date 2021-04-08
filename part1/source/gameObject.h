@@ -36,7 +36,7 @@ struct gameState {
 struct object initObject();
 struct object initFrog();
 void updateFrogLocation(int buttonPress, struct gameState *g);
-void updateObjects(struct gameState *g);
+int updateObjects(struct gameState *g);
 void setObjects(int level, struct gameState *g);
 int checkCollision(struct object *o, struct object *frog);
 //void updateLocation(struct object *o);
