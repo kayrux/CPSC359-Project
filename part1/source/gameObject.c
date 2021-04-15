@@ -32,6 +32,7 @@ struct gameState {
     int pause;
     int score;
     int lives;
+    int level;
     int win;
     int lose;
 	int *buttons;
@@ -157,7 +158,6 @@ int updateObjects(struct gameState *g) {
                     return 1;
                 }
             }
-            
         }  
     }
     return 0;
@@ -195,6 +195,8 @@ void setObjects(int level, struct gameState *g) {
         for (int i = 1; i < NUM_OBJECTS; i++) {
             g->objects[i].active = 1;
             g->objects[i].direction = i%2;
+            g->objects[i].xOffset = 0;
+            g->objects[i].xCellOff = 0;
             if ((i%2) == 0) {
                 g->objects[i].xOffset = SCREEN_WIDTH;
                 g->objects[i].xCellOff = GAME_GRID_WIDTH;

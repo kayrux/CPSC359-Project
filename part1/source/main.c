@@ -53,6 +53,11 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
 }
 
 struct gameState g;
+void mainMenu();
+
+void initTime() {
+    g.time = time(0);
+}
 
 /*
 * Initializes the game state.
@@ -65,6 +70,8 @@ void initGameState() {
     g.lose = 0;
     g.score = 0;
     g.lives = 4;
+    g.level = 1;
+    initTime();
     g.buttons = malloc(16 * sizeof(int));
     g.buttonsPressed = malloc(16 * sizeof(int));
     g.objects = malloc(NUM_OBJECTS * sizeof(struct object));
@@ -77,6 +84,21 @@ void initGameState() {
         g.objects[i] = initObject();
     }
     g.gameMap = malloc(1280 * 720 * 2);
+}
+
+void resetGameState() {
+    setObjects(g.level, &g);
+    g.objects[0] = initFrog();
+    g.win = 0;
+    g.lose = 0;
+    g.score = 0;
+    g.lives = 4;
+    g.level = 1;
+    initTime();
+}
+
+void updateTime() {
+    g.time = time(0) - g.time;
 }
 
 void renderObject(struct object *o) {
@@ -118,9 +140,22 @@ void updateFrog() {
     else if (getButtonPress(7) == 0) updateFrogLocation(3, &g);    // RIGHT
 }
 
+
 void update() {
-    updateObjects(&g);
+
+    int collision = updateObjects(&g);
+    if (collision) {
+        g.lives -= 1;
+        printf("You have lost a life! Frog lives: %d\n", g.lives);
+        if (g.lives <= 0) {
+            printf("GAME OVER\n");
+            g.lose = 1;
+            g.pause = 1;
+            //mainMenu();
+        }
+    }
     updateFrog();
+
 }
 
 /*
@@ -131,14 +166,12 @@ void update() {
 void *gameLoop(void *p) {
     printf("Game start...\n");
 
-    // TEST CODE
-    setObjects(1, &g);
-    // END TEST
+    
     while (g.run == 1) {
         while(g.pause == 1);
         update();
 		render();
-        //wait(1000);
+        if (g.pause == 1) mainMenu();  
     }
     pthread_exit(NULL);
 }
@@ -155,9 +188,6 @@ void *input(void *p) {
     }
     unsigned int *gpioPtr = getGPIOPtr();
 
-    /* initialize + get FBS */
-	framebufferstruct = initFbInfo();
-	drawStart();
     while(g.run == 1) {
         read_SNES(gpioPtr, g.buttons);
         for (int i = 0; i < 16; i ++) {
@@ -175,6 +205,7 @@ void *input(void *p) {
 }
 
 void mainMenu() {
+    drawStart();
     int startSelect = 1;                    // Begins with the start option selected.
     int quitSelect = 0;
     g.pause = 1;                            // Pause game
@@ -200,10 +231,15 @@ void mainMenu() {
 				levelOneLoadDraw();
 				sleep(2);
 				levelOnePlayDraw(g.gameMap);
+                // TEST CODE
+                resetGameState();
+                // END TEST
             } else {                            // Quit game
                 printf("Game Quit!!!!!\n");
+                clear();
                 g.run = 0;
                 g.pause = 0;
+                
             }
         }  
     }
@@ -223,7 +259,8 @@ int main() {
     pthread_t tidInput;
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
-	
+	/* initialize + get FBS */
+	framebufferstruct = initFbInfo();
     pthread_create(&tidInput, &attr, input, NULL);          // Start input loop
     g.run = 1;
     mainMenu();                                             // Start Menu
