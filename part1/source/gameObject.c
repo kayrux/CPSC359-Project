@@ -32,6 +32,7 @@ struct gameState {
     int pause;
     int score;
     int lives;
+    int level;
     int win;
     int lose;
 	int *buttons;
@@ -81,8 +82,21 @@ struct object initFrog() {
 void updateLocation(struct object *o);
 
 /*
+* Resets the frogs location to the bottom center of the screen.
+* @param frog: The frog object.
+* @return: none.
+*/
+void resetFrogLocation(struct object *frog) {
+    frog->xCellOff = 19;
+    frog->yCellOff = 19;
+    frog->xOffset = frog->xCellOff * X_CELL_PIXEL_SCALE;
+    frog->yOffset = frog->xCellOff * Y_CELL_PIXEL_SCALE;
+}
+
+/*
 * Updates the frog's position based on the arrow buttons.
-* @param: none
+* @param buttonPress: The int corresponding to the button that was pressed.
+* @param *g: The current gameState.
 * @return: none
 */
 void updateFrogLocation(int buttonPress, struct gameState *g) {
@@ -118,11 +132,17 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
     }
 }
 
-//https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+/* Collision detection modified from https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+* Checks for a collision between the first object and the second.
+* @param *o: The first object.
+* @param *frog: The second object.
+* @return: 1 if there is a collision. 0 if there is no collision.
+*/
 int checkCollision(struct object *o, struct object *frog) {
     if ((o->xOffset < frog->xOffset + frog->width) &&
         (o->xOffset + o->width > frog->xOffset)) {
             o->active = 0;
+            resetFrogLocation(frog);
             printf("Collision! Object: (%d, %d), Frog(%d, %d)\n", o->xOffset, o->yOffset, frog->xOffset, frog->yOffset);
             return 1;
     }
@@ -131,19 +151,23 @@ int checkCollision(struct object *o, struct object *frog) {
 
 int updateObjects(struct gameState *g) {
     for (int i = 1; i < NUM_OBJECTS; i++) {
-        if (g->objects[i].active == 1) {
+        if (g->objects[i].active == 1) {            // Updates the object if it is active
             updateLocation(&g->objects[i]);
-            if ((g->objects[i].collidable == 1) && (g->objects[i].yOffset == g->objects[0].yOffset)) {
+            if ((g->objects[i].collidable == 1) && (g->objects[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if (checkCollision(&g->objects[i], &g->objects[0]) == 1) {
                     return 1;
                 }
             }
-            
         }  
     }
     return 0;
 }
 
+/* 
+* Updates the location of the given object based on direction, current location, and speed.
+* @param *o: The object to update.
+* @return: none.
+*/
 void updateLocation(struct object *o) {
     if (o->direction == 0) {
         o->xOffset -= o->speed;
@@ -171,6 +195,8 @@ void setObjects(int level, struct gameState *g) {
         for (int i = 1; i < NUM_OBJECTS; i++) {
             g->objects[i].active = 1;
             g->objects[i].direction = i%2;
+            g->objects[i].xOffset = 0;
+            g->objects[i].xCellOff = 0;
             if ((i%2) == 0) {
                 g->objects[i].xOffset = SCREEN_WIDTH;
                 g->objects[i].xCellOff = GAME_GRID_WIDTH;

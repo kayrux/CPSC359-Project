@@ -23,6 +23,7 @@ struct gameState {
     int pause;
     int score;
     int lives;
+    int level;
     int win;
     int lose;
 	int *buttons;
@@ -39,6 +40,7 @@ void updateFrogLocation(int buttonPress, struct gameState *g);
 int updateObjects(struct gameState *g);
 void setObjects(int level, struct gameState *g);
 int checkCollision(struct object *o, struct object *frog);
+void resetFrogLocation(struct object *frog);
 //void updateLocation(struct object *o);
 
 #endif
