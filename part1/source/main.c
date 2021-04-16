@@ -35,6 +35,8 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
+#define TIME_LIMIT 30
+
 
 /*
 * Initializes the given GPIO line based on the desired function
@@ -56,7 +58,7 @@ struct gameState g;
 void mainMenu();
 
 void initTime() {
-    g.time = time(0);
+    g.time = 0;
 }
 
 /*
@@ -97,8 +99,8 @@ void resetGameState() {
     initTime();
 }
 
-void updateTime() {
-    g.time = time(0) - g.time;
+void updateTime(long initialTime) {
+    if ((time(0) - g.time) >= 1) g.time ++;
 }
 
 void renderObject(struct object *o) {
@@ -147,15 +149,16 @@ void update() {
     if (collision) {
         g.lives -= 1;
         printf("You have lost a life! Frog lives: %d\n", g.lives);
+        //printf("Time taken: %ld\n", g.time);
+        //initTime();         // reset timer
         if (g.lives <= 0) {
             printf("GAME OVER\n");
             g.lose = 1;
             g.pause = 1;
-            //mainMenu();
         }
     }
     updateFrog();
-
+    if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
 }
 
 /*
@@ -165,13 +168,13 @@ void update() {
 */
 void *gameLoop(void *p) {
     printf("Game start...\n");
-
-    
-    while (g.run == 1) {
-        while(g.pause == 1);
+    while (g.run) {
+        while(g.pause) if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
         update();
 		render();
-        if (g.pause == 1) mainMenu();  
+        if (g.pause && g.lose) {                    // GAME OVER
+            mainMenu();       
+        }
     }
     pthread_exit(NULL);
 }
@@ -210,7 +213,7 @@ void mainMenu() {
     int quitSelect = 0;
     g.pause = 1;                            // Pause game
     printf("Start: Selected\n");
-    while (g.pause == 1) {
+    while (g.pause) {
         if ((getButtonPress(4) == 0) || (getButtonPress(5) == 0)) {   // 'Up' or 'Down' button pressed
             startSelect = 1 - startSelect;
             quitSelect = 1 - quitSelect;
