@@ -58,6 +58,7 @@ struct gameState g;
 void mainMenu();
 
 void initTime() {
+    g.sTime = time(0);
     g.time = 0;
 }
 
@@ -99,8 +100,8 @@ void resetGameState() {
     initTime();
 }
 
-void updateTime(long initialTime) {
-    if ((time(0) - g.time) >= 1) g.time ++;
+void updateTime() {
+    g.time = time(0) - g.sTime;
 }
 
 void renderObject(struct object *o) {
@@ -149,14 +150,15 @@ void update() {
     if (collision) {
         g.lives -= 1;
         printf("You have lost a life! Frog lives: %d\n", g.lives);
-        //printf("Time taken: %ld\n", g.time);
-        //initTime();         // reset timer
+        printf("Time taken: %ld seconds\n", g.time);
+        initTime();         // reset timer
         if (g.lives <= 0) {
             printf("GAME OVER\n");
             g.lose = 1;
             g.pause = 1;
         }
     }
+    updateTime();
     updateFrog();
     if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
 }
