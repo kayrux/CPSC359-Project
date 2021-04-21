@@ -10,7 +10,13 @@
 #include <res/levelOneLoad.h>
 #include <res/levelOnePlay.h>
 #include <res/FrogUpBase.h>
+#include <res/PauseRestart.h>
+#include <res/PauseExit.h>
+#include <res/Car1LeftBaseClear.h>
+#include <res/Car2LeftBaseClear.h>
 #include <res/Car3RightBaseClear.h>
+#include <res/Car4RightBaseClear.h>
+#include <res/Car5LeftBaseClear.h>
 
 #define X_CELL_PIXEL_SCALE 32
 #define Y_CELL_PIXEL_SCALE 32
@@ -74,14 +80,39 @@ void drawFrog(int xOffset, int yCellOff, char *fBuffer) {
 	pixel = NULL;
 }
 
-void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer) {
+void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer, int id) {
 	short int *imagePtr=(short int *) ImageCar3RightBaseClear.pixel_data;
+	int height = ImageCar3RightBaseClear.height;
+	int width = ImageCar3RightBaseClear.width;
+	if(id == 1) {
+		imagePtr=(short int *) ImageCar1LeftBaseClear.pixel_data;
+		height = ImageCar1LeftBaseClear.height;
+		width = ImageCar1LeftBaseClear.width;
+	} else if(id == 2) {
+		imagePtr=(short int *) ImageCar2LeftBaseClear.pixel_data;
+		height = ImageCar2LeftBaseClear.height;
+		width = ImageCar2LeftBaseClear.width;
+	} else if(id == 3) {
+		imagePtr=(short int *) ImageCar3RightBaseClear.pixel_data;
+		height = ImageCar3RightBaseClear.height;
+		width = ImageCar3RightBaseClear.width;
+	} else if(id == 4) {
+		imagePtr=(short int *) ImageCar4RightBaseClear.pixel_data;
+		height = ImageCar4RightBaseClear.height;
+		width = ImageCar4RightBaseClear.width;
+	} else if(id == 5) {
+		imagePtr=(short int *) ImageCar5LeftBaseClear.pixel_data;
+		height = ImageCar5LeftBaseClear.height;
+		width = ImageCar5LeftBaseClear.width;
+	}
+	 
+
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
 	if (xOffset < 0) xOffset = 0;
 	int i = 0;							// Accounts for images partway off the screen
-	for (int y = 0; y < ImageCar3RightBaseClear.height; y++) {
-		for (int x = 0; x < ImageCar3RightBaseClear.width; x++) {	
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {	
 			if ((outOfBounds(x + xOffset) != 1)) { 
 				pixel->color = imagePtr[i];
 				pixel->x = x + xOffset;
@@ -103,12 +134,6 @@ void drawStart() {
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
 	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 
 	int i=0;
@@ -134,12 +159,6 @@ void mainMenuDrawStart() {
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
 	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 
 	int i=0;
@@ -162,12 +181,6 @@ void mainMenuDrawExit() {
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
 	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 
 	int i=0;
@@ -228,6 +241,49 @@ void levelOnePlayDraw(char *fBuffer) {
 	pixel = NULL;
 }
 
+void restartGamePause(char *fBuffer) {
+	short int *alienPtr=(short int *) pauseRestartImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	
+	int i=0;
+	for (int y = 160; y < 560; y++) {
+		for (int x = 490; x < 790; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
+
+void exitGamePause(char *fBuffer) {
+	short int *alienPtr=(short int *) pauseExitImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
+	
+	int i=0;
+	for (int y = 160; y < 560; y++) {
+		for (int x = 490; x < 790; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
 
 void writePixel(Pixel *pixel, char *fBuffer) {
 	long int location =(pixel->x +framebufferstruct.xOff) * (framebufferstruct.bits/8) +

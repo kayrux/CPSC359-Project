@@ -46,6 +46,15 @@ struct gameState {
 
 struct object initObject() {
     struct object o;
+    int dir = rand() % 2;
+    int speed = rand() % 11 + 3;
+    int ran = rand() % 5 + 1;
+    if(dir%2 == 0) {
+        while (ran == 3 || ran == 4) {ran = rand() % 5 + 1;}
+    } else {
+        while (ran == 1 || ran == 2 || ran == 5) {ran = rand() % 5 + 1;}
+    }
+    
     o.collidable = 1;           // 0 = not collidable. 1 = collidable 
     o.xStart = 0;               // Used for objects partway through the screen
     o.xCellOff = 0;             // X cell position of object
@@ -56,9 +65,9 @@ struct object initObject() {
     o.height = 32;               // Height of object
     o.platform = 0;             // 0 = not a platform. 1 = platform
     o.active = 0;               // 0 = not active. 1 = active
-    o.id = 0;                   // [frog, Car3RightBaseClear]
-    o.direction = 0;            // 0 = left. 1 = right. 2 = up. 3 = down.
-    o.speed = 3;                // Speed of the object
+    o.id = ran;                   // [frog, Car3RightBaseClear]
+    o.direction = dir;            // 0 = left. 1 = right. 2 = up. 3 = down.
+    o.speed = speed;                // Speed of the object
     return o;
 }
 
@@ -172,18 +181,15 @@ int updateObjects(struct gameState *g) {
 void updateLocation(struct object *o) {
     if (o->direction == 0) {
         o->xOffset -= o->speed;
-        if (o->xOffset < 0) {
-            o->xStart += o->speed;
-            if (o->xStart >= 32) {
-                o->xStart = 0;
-                o->active = 0;
-            }
+        if (o->xOffset + 4 < 0) {
+            o->speed = rand() % 11 + 3;
+            o->xOffset = SCREEN_WIDTH;
         }
     } else {
         o->xOffset += o->speed;
         if (o->xOffset > SCREEN_WIDTH) {
-            o->xOffset = SCREEN_WIDTH;
-            o->active = 0;
+            o->speed = rand() % 11 + 3;
+            o->xOffset = 0;
         }
     }
     o->xCellOff = o->xOffset / X_CELL_PIXEL_SCALE;
@@ -195,18 +201,14 @@ void setObjects(int level, struct gameState *g) {
     if (level == 1) {
         for (int i = 1; i < NUM_OBJECTS; i++) {
             g->objects[i].active = 1;
-            g->objects[i].direction = i%2;
-//            if ((i%2) == 0) g->objects[i].xOffset = SCREEN_WIDTH;
-//            g->objects[i].yCellOff = i + 2;
-//            g->objects[i].yOffset = (i + 2) * Y_CELL_PIXEL_SCALE;
             g->objects[i].xOffset = 0;
             g->objects[i].xCellOff = 0;
-            if ((i%2) == 0) {
+            if ((g->objects[i].direction%2) == 0) {
                 g->objects[i].xOffset = SCREEN_WIDTH;
                 g->objects[i].xCellOff = GAME_GRID_WIDTH;
             }
-            g->objects[i].yCellOff = i;
-            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            g->objects[i].yCellOff = i+2;
+            g->objects[i].yOffset = (i+2) * Y_CELL_PIXEL_SCALE;
         }
     }
 }
