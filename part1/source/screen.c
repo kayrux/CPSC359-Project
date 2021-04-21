@@ -24,12 +24,21 @@
 #define SCREEN_HEIGHT 720
 // RESOLUTION: 1280x720
 
+
+// The coordinates of frog life images
 #define FROG_LIFE_Y_COORD 656
 #define FROG_LIFE_0_X_COORD 123
 #define FROG_LIFE_1_X_COORD 83
 #define FROG_LIFE_2_X_COORD 43
 #define FROG_LIFE_3_X_COORD 0
 
+// The coordinates for the time bar
+#define TIME_BAR_Y_COORD 654
+#define TIME_BAR_X_COORD 197
+#define TIME_BAR_WIDTH 908
+#define TIME_BAR_HEIGHT 36
+#define TIME_LIMIT 45
+#define TIME_SEGMENT (TIME_BAR_WIDTH / TIME_LIMIT)
 
 /* Definitions */
 typedef struct {
@@ -54,7 +63,7 @@ void clear() {
 	//unsigned int quarter,byte,word;
 	for (int y = 0; y < 720; y++) {
 		for (int x = 0; x < 1280; x++) {	
-				pixel->color = 256; 
+				pixel->color = 0; 
 				pixel->x = x;
 				pixel->y = y;
 	
@@ -244,6 +253,25 @@ void levelOnePlayDraw(char *fBuffer) {
 	pixel = NULL;
 }
 
+void coverTimeBar(char *fBuffer, int time) {
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	if (time < 0) time = 0;
+	int time_segment = (TIME_SEGMENT * time) + 1;
+	int width = time_segment + TIME_BAR_X_COORD;
+	int i=0;
+	for (int y = 0; y < TIME_BAR_HEIGHT; y++) {
+		for (int x = TIME_BAR_X_COORD; x < width; x++) {	
+				pixel->color = 0; 
+				pixel->x = x;
+				pixel->y = y + TIME_BAR_Y_COORD;
+	
+				writePixel(pixel, fBuffer);
+				i++;	
+		}
+	}
+}
+
 void restartGamePause(char *fBuffer) {
 	short int *alienPtr=(short int *) pauseRestartImage.pixel_data;
 	/* initialize a pixel */
@@ -309,7 +337,7 @@ void coverFrogLives(char *fBuffer, int frogLives) {
 	int i=0;
 	for (int y = 0; y < Y_CELL_PIXEL_SCALE; y++) {
 		for (int x = 0; x <  width; x++) {	
-				pixel->color = 256; 
+				pixel->color = 0; 
 				pixel->x = x;
 				pixel->y = y + FROG_LIFE_Y_COORD;
 	
