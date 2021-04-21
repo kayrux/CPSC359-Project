@@ -5,6 +5,14 @@
 #include <string.h>
 
 // res folder
+#include <res/snakeImage.h>
+#include <res/otterImage.h>
+#include <res/crocImage.h>
+#include <res/turtleLanding.h>
+#include <res/turtleNotLanding.h>
+#include <res/smallLog.h>
+#include <res/mediumLog.h>
+#include <res/largeLog.h>
 #include <res/selectStart.h>
 #include <res/selectExit.h>
 #include <res/levelOneLoad.h>
