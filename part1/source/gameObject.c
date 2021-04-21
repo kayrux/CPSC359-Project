@@ -47,7 +47,7 @@ struct gameState {
 struct object initObject() {
     struct object o;
     int dir = rand() % 2;
-    int speed = rand() % 11 + 3;
+    int speed = rand() % 11 + 5;
     int ran = rand() % 5 + 1;
     if(dir%2 == 0) {
         while (ran == 3 || ran == 4) {ran = rand() % 5 + 1;}
@@ -151,7 +151,6 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
 int checkCollision(struct object *o, struct object *frog) {
     if ((o->xOffset < frog->xOffset + frog->width) &&
         (o->xOffset + o->width > frog->xOffset)) {
-            o->active = 0;
             resetFrogLocation(frog);
             printf("Collision! Object: (%d, %d), Frog(%d, %d)\n", o->xOffset, o->yOffset, frog->xOffset, frog->yOffset);
             return 1;
@@ -182,13 +181,13 @@ void updateLocation(struct object *o) {
     if (o->direction == 0) {
         o->xOffset -= o->speed;
         if (o->xOffset + 4 < 0) {
-            o->speed = rand() % 11 + 3;
+            o->speed = rand() % 11 + 5;
             o->xOffset = SCREEN_WIDTH;
         }
     } else {
         o->xOffset += o->speed;
         if (o->xOffset > SCREEN_WIDTH) {
-            o->speed = rand() % 11 + 3;
+            o->speed = rand() % 11 + 5;
             o->xOffset = 0;
         }
     }

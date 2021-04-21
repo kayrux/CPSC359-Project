@@ -9,9 +9,13 @@
 #include <res/selectExit.h>
 #include <res/levelOneLoad.h>
 #include <res/levelOnePlay.h>
+#include <res/LevelTwoLoad.h>
+#include <res/LevelTwoPlay.h>
 #include <res/FrogUpBase.h>
 #include <res/PauseRestart.h>
 #include <res/PauseExit.h>
+#include <res/WinnerScreen.h>
+#include <res/GameOverScreen.h>
 #include <res/Car1LeftBaseClear.h>
 #include <res/Car2LeftBaseClear.h>
 #include <res/Car3RightBaseClear.h>
