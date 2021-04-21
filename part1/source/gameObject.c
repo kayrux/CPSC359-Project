@@ -134,9 +134,9 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
             }
             break;
         case 3:     //RIGHT
-            if ((g->objects[0].xOffset) < SCREEN_WIDTH) {
+            if ((g->objects[0].xOffset) < SCREEN_WIDTH - X_CELL_PIXEL_SCALE) {
                 g->objects[0].xOffset += X_CELL_PIXEL_SCALE;
-                if (g->objects[0].xOffset > SCREEN_WIDTH) g->objects[0].xOffset = SCREEN_WIDTH;
+                if (g->objects[0].xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) g->objects[0].xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE;
             }
             break;
     }

@@ -104,8 +104,18 @@ void resetGameState() {
     initTime();
 }
 
+void gameOver() {
+    printf("GAME OVER\n");
+    g.lose = 1;
+    g.pause = 1;
+}
+
 void updateTime() {
-    g.time = time(0) - g.sTime;
+    if ((time(0) - g.sTime) >= 1) {
+        g.time ++;
+        g.sTime = time(0);
+    }
+    if (g.time >= TIME_LIMIT) gameOver();
 }
 
 void renderObject(struct object *o) {
@@ -118,6 +128,7 @@ void render() {
         if (g.objects[i].active == 1) {renderObject(&g.objects[i]);}  // render Object based on id
     }
     drawFrog(g.objects[0].xOffset, g.objects[0].yCellOff, g.gameMap);         // Draw frog
+    if (g.lives < 4) coverFrogLives(g.gameMap, g.lives);
     renderScreen(g.gameMap);
 }
 
@@ -147,20 +158,21 @@ void updateFrog() {
     else if (getButtonPress(7) == 0) updateFrogLocation(3, &g);    // RIGHT
 }
 
+void frogLifeLost() {
+    g.lives -= 1;
+    printf("You have lost a life! Frog lives: %d\n", g.lives);
+    printf("Time taken: %ld seconds\n", g.time);
+    initTime();         // reset timer
+    if (g.lives <= 0) {
+        gameOver();
+    }
+}
 
 void update() {
 
     int collision = updateObjects(&g);
     if (collision) {
-        g.lives -= 1;
-        printf("You have lost a life! Frog lives: %d\n", g.lives);
-        printf("Time taken: %ld seconds\n", g.time);
-        initTime();         // reset timer
-        if (g.lives <= 0) {
-            printf("GAME OVER\n");
-            g.lose = 1;
-            g.pause = 1;
-        }
+        frogLifeLost();
     }
     updateTime();
     updateFrog();
