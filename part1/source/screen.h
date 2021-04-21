@@ -19,6 +19,7 @@ void mainMenuDrawExit();
 void levelOneLoadDraw();
 void levelOnePlayDraw(char *gameMap);
 void coverFrogLives(char *fBuffer, int frogLives);
+void coverTimeBar(char *fBuffer, int time);
 void renderScreen(char *gameMap);
 
 #endif
