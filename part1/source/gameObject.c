@@ -40,6 +40,7 @@ struct gameState {
     struct object *objects;
     int **gameMap;
 	long time;
+    long sTime;
     char* fBuffer;
 };
 

@@ -30,6 +30,7 @@ struct gameState {
     int *buttonsPressed;
     struct object *objects;
 	long time;
+    long sTime;
     char* gameMap;
 };
 
