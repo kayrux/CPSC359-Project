@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#define NUM_OBJECTS 16
+#define NUM_OBJECTS 14
 #define GAME_GRID_WIDTH 40
 #define GAME_GRID_HEIGHT 20
 #define X_CELL_PIXEL_SCALE 32
@@ -175,8 +175,8 @@ void setObjects(int level, struct gameState *g) {
             g->objects[i].active = 1;
             g->objects[i].direction = i%2;
             if ((i%2) == 0) g->objects[i].xOffset = SCREEN_WIDTH;
-            g->objects[i].yCellOff = i;
-            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            g->objects[i].yCellOff = i + 2;
+            g->objects[i].yOffset = (i + 2) * Y_CELL_PIXEL_SCALE;
         }
     }
 }
