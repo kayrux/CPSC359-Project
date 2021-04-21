@@ -15,7 +15,6 @@
 #include <sys/mman.h>
 #include <gameObject.h>
 
-
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
 //#define INP_GPIO(g) *(gpioPtr+((g)/10)) &= ~(7<<(((g)%10)*3))
 //#define OUT_GPIO(g) *(gpioPtr+((g)/10)) |= (1<<(((g)%10)*3))
@@ -56,6 +55,7 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
 
 struct gameState g;
 void mainMenu();
+void pauseMenu();
 
 void initTime() {
     g.sTime = time(0);
@@ -90,13 +90,18 @@ void initGameState() {
 }
 
 void resetGameState() {
+    for(int i = 1; i < NUM_OBJECTS; i++) {
+        g.objects[i] = initObject();
+    }
     setObjects(g.level, &g);
     g.objects[0] = initFrog();
+    
     g.win = 0;
     g.lose = 0;
     g.score = 0;
     g.lives = 4;
     g.level = 1;
+    
     initTime();
 }
 
@@ -115,14 +120,14 @@ void updateTime() {
 }
 
 void renderObject(struct object *o) {
-    drawCar1(o->xCellOff, o->yCellOff, o->xOffset, o->xStart, g.gameMap);
+    drawCar1(o->xCellOff, o->yCellOff, o->xOffset, o->xStart, g.gameMap, o->id);
 }
 
 void render() {
     levelOnePlayDraw(g.gameMap);                                             // Level One Background
-    for (int i = 1; i < NUM_OBJECTS; i ++) {
-        if (g.objects[i].active == 1) renderObject(&g.objects[i]);  // render Object based on id
-    }    
+    for (int i = 1; i < NUM_OBJECTS; i++) {
+        if (g.objects[i].active == 1) {renderObject(&g.objects[i]);}  // render Object based on id
+    }
     drawFrog(g.objects[0].xOffset, g.objects[0].yCellOff, g.gameMap);         // Draw frog
     if (g.lives < 4) coverFrogLives(g.gameMap, g.lives);
     coverTimeBar(g.gameMap, g.time);
@@ -187,8 +192,11 @@ void *gameLoop(void *p) {
         while(g.pause) if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
         update();
 		render();
+        if (g.pause && !g.lose) {                    // GAME OVER
+            pauseMenu();
+        }
         if (g.pause && g.lose) {                    // GAME OVER
-            mainMenu();       
+            mainMenu();
         }
     }
     pthread_exit(NULL);
@@ -220,6 +228,49 @@ void *input(void *p) {
     }
     munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
     pthread_exit(NULL);
+}
+
+void pauseMenu() {
+    restartGamePause(g.gameMap);
+    int restartSelect = 1;                    // Begins with the start option selected.
+    int exitSelect = 0;
+    g.pause = 1;                            // Pause game
+    printf("Restart: Selected\n");
+    while (g.pause) {
+        if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
+        if ((getButtonPress(4) == 0) || (getButtonPress(5) == 0)) {   // 'Up' or 'Down' button pressed
+            restartSelect = 1 - restartSelect;
+            exitSelect = 1 - exitSelect;
+            if (restartSelect == 1) {
+				printf("Restart Game: Selected\n");
+				restartGamePause(g.gameMap);
+			} else {
+				printf("Exit Game: Selected\n");
+				exitGamePause(g.gameMap);
+			}
+            
+        }
+        if (getButtonPress(8) == 0) {           // 'A' button pressed
+            if (restartSelect == 1) {             // Start game
+                g.pause = 0;
+                printf("Game Restart!!!!!\n");
+				sleep(1);
+				levelOneLoadDraw();
+				sleep(2);
+				levelOnePlayDraw(g.gameMap);
+                // TEST CODE
+                resetGameState();
+                // END TEST
+            } else {                            // Quit game
+                //Maybe add some sort of bye message or comfirmation?
+                printf("Game Exit!!!!!\n");
+                clear();
+                g.run = 0;
+                g.pause = 0;
+                
+            }
+        }  
+    }
 }
 
 void mainMenu() {
@@ -271,6 +322,7 @@ void mainMenu() {
 * @return: zero
 */
 int main() {
+    srand(time(0));
     initGameState();
 
     pthread_t tidGameLoop;
