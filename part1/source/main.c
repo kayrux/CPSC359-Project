@@ -34,7 +34,7 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
-#define TIME_LIMIT 30
+#define TIME_LIMIT 45
 
 
 /*
@@ -55,6 +55,7 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
 
 struct gameState g;
 void mainMenu();
+void pauseMenu();
 
 void initTime() {
     g.sTime = time(0);
@@ -129,6 +130,7 @@ void render() {
     }
     drawFrog(g.objects[0].xOffset, g.objects[0].yCellOff, g.gameMap);         // Draw frog
     if (g.lives < 4) coverFrogLives(g.gameMap, g.lives);
+    coverTimeBar(g.gameMap, g.time);
     renderScreen(g.gameMap);
 }
 
@@ -244,7 +246,7 @@ void pauseMenu() {
 				restartGamePause(g.gameMap);
 			} else {
 				printf("Exit Game: Selected\n");
-				exitGamePause();
+				exitGamePause(g.gameMap);
 			}
             
         }
