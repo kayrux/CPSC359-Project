@@ -18,6 +18,13 @@
 #define SCREEN_HEIGHT 720
 // RESOLUTION: 1280x720
 
+#define FROG_LIFE_Y_COORD 656
+#define FROG_LIFE_0_X_COORD 123
+#define FROG_LIFE_1_X_COORD 83
+#define FROG_LIFE_2_X_COORD 43
+#define FROG_LIFE_3_X_COORD 0
+
+
 /* Definitions */
 typedef struct {
 	int color;
@@ -106,13 +113,6 @@ void drawStart() {
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
 
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
-	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
-
 	int i=0;
 	for (int y = 0; y < 720; y++) {
 		for (int x = 0; x < 1280; x++) {	
@@ -136,13 +136,6 @@ void mainMenuDrawStart() {
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
 
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
-	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
-
 	int i=0;
 	for (int y = 0; y < 720; y++) { 
 		for (int x = 0; x < 1280; x++) {
@@ -164,13 +157,6 @@ void mainMenuDrawExit() {
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
 
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
-	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
-
 	int i=0;
 	for (int y = 0; y < 720; y++) { 
 		for (int x = 0; x < 1280; x++) {
@@ -191,13 +177,6 @@ void levelOneLoadDraw() {
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
-	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 	
 	int i=0;
 	for (int y = 0; y < 720; y++) { 
@@ -219,13 +198,6 @@ void levelOnePlayDraw(char *fBuffer) {
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-
-	float res = framebufferstruct.screenSize;
-	float length = framebufferstruct.lineLength;
-	float width = framebufferstruct.screenSize/framebufferstruct.lineLength;
-	int offsetY = (width-720)/2;
-	int offsetX = (length-1280)/2;
-	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 	
 	int i=0;
 	for (int y = 0; y < 720; y++) {
@@ -242,6 +214,38 @@ void levelOnePlayDraw(char *fBuffer) {
 	pixel = NULL;
 }
 
+void coverFrogLives(char *fBuffer, int frogLives) {
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	int width = 0;
+	switch(frogLives) {
+		case 3:
+			width = FROG_LIFE_3_X_COORD + X_CELL_PIXEL_SCALE;
+			break;
+		case 2:
+			width = FROG_LIFE_2_X_COORD + X_CELL_PIXEL_SCALE;
+			break;
+		case 1:
+			width = FROG_LIFE_1_X_COORD + X_CELL_PIXEL_SCALE;
+			break;
+		case 0:
+			width = FROG_LIFE_0_X_COORD + X_CELL_PIXEL_SCALE;
+			break;
+	}
+	int i=0;
+	for (int y = 0; y < Y_CELL_PIXEL_SCALE; y++) {
+		for (int x = 0; x <  width; x++) {	
+				pixel->color = 256; 
+				pixel->x = x;
+				pixel->y = y + FROG_LIFE_Y_COORD;
+	
+				writePixel(pixel, fBuffer);
+				i++;	
+		}
+	}
+	free(pixel);
+	pixel = NULL;
+}
 
 void writePixel(Pixel *pixel, char *fBuffer) {
 	long int location =(pixel->x +framebufferstruct.xOff) * (framebufferstruct.bits/8) +
