@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#define NUM_OBJECTS 16
 #define NUM_VALUE_PACKS 4
+#define NUM_OBJECTS 19
+
 #define GAME_GRID_WIDTH 40
 #define GAME_GRID_HEIGHT 20
 #define X_CELL_PIXEL_SCALE 32
@@ -38,6 +39,7 @@ struct gameState {
     int moves;
     int win;
     int lose;
+    int next;
 	int *buttons;
     int *buttonsPressed;
     struct object *objects;
@@ -60,7 +62,7 @@ struct object initValuePack(int num) {
     o.height = Y_CELL_PIXEL_SCALE;               // Height of object
     o.platform = 0;             // 0 = not a platform. 1 = platform
     o.active = 0;               // 0 = not active. 1 = active
-    o.id = 10;                   // bonus pack
+    o.id = 16;                   // bonus pack
     o.direction = 0;            // 0 = left. 1 = right. 2 = up. 3 = down.
     o.speed = 0;                // Speed of the object
     if (num == 0) {
@@ -98,6 +100,7 @@ struct object initObject() {
     o.speed = speed;                // Speed of the object
     o.spawnTime = 0;            // When the object spawns
     if (o.id == 5) o.width = X_CELL_PIXEL_SCALE * 2;
+    
 
     return o;
 }
@@ -145,14 +148,14 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
     int moveMade = 0;
     switch (buttonPress) {
         case 0:     //UP
-            if (g->objects[0].yCellOff > 0) {
+            if (g->objects[0].yCellOff >= 0) {
                 g->objects[0].yCellOff -= 1;
                 g->objects[0].yOffset -= Y_CELL_PIXEL_SCALE;
             }
             moveMade = 1;
             break;
         case 1:     //DOWN
-            if ((g->objects[0].yCellOff + 1) < GAME_GRID_HEIGHT) {
+            if ((g->objects[0].yCellOff + 1) < GAME_GRID_HEIGHT + 1) {
                 g->objects[0].yCellOff += 1;
                 g->objects[0].yOffset += Y_CELL_PIXEL_SCALE;
             }
@@ -177,6 +180,17 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
             moveMade = 1;
             break;
     }
+    if (g->objects[0].yCellOff == -1) {
+        g->level++;
+        g->next = 1;
+        resetFrogLocation(&g->objects[0]);
+    }
+    if (g->objects[0].yCellOff == 20 && g->level > 1) {
+        g->level--;
+        g->next = 1;
+        g->objects[0].yCellOff = 0;
+        g->objects[0].xCellOff = 19;
+    }
     if (moveMade) {
         g->moves -= 1;
     }
@@ -199,8 +213,8 @@ int checkCollision(struct object *o, struct object *frog) {
 }
 
 void frogOnPlatform(struct object *o, struct object *frog) {
-    if ((o->xOffset + (o->width / 2) < frog->xOffset + frog->width) &&
-        ((o->xOffset + o-> width) - (o->width / 4) > frog->xOffset)) {
+    if ((o->xOffset + (X_CELL_PIXEL_SCALE / 2) < frog->xOffset + frog->width) &&
+        ((o->xOffset + o-> width) - (X_CELL_PIXEL_SCALE / 2) > frog->xOffset)) {
         int frogOffset = o->speed;
         if (o->direction == 0) frogOffset = frogOffset * -1;
         frog->xOffset += frogOffset;
@@ -265,6 +279,10 @@ void updateLocation(struct object *o) {
 void setObjects(int level, struct gameState *g) {
     if (level == 1) {
         for (int i = 1; i < NUM_OBJECTS; i++) {
+            if(g->objects[i].id > 5) {
+                g->objects[i].id = g->objects[i].id - 5;
+            }
+            
             g->objects[i].active = 1;
             g->objects[i].xOffset = 0;
             g->objects[i].xCellOff = 0;
@@ -272,8 +290,95 @@ void setObjects(int level, struct gameState *g) {
                 g->objects[i].xOffset = SCREEN_WIDTH;
                 g->objects[i].xCellOff = GAME_GRID_WIDTH;
             }
-            g->objects[i].yCellOff = i+2;
-            g->objects[i].yOffset = (i+2) * Y_CELL_PIXEL_SCALE;
+            g->objects[i].yCellOff = i;
+            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            g->objects[i].collidable = 1;
+            g->objects[i].platform = 0;
+        }
+        for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+            g->valuePacks[i] = initValuePack(i);
+        }
+    }
+
+    if (level == 2) {
+        for (int i = 1; i < NUM_OBJECTS; i++) {
+            if(g->objects[i].id < 6) {
+                g->objects[i].id = g->objects[i].id + 5;
+            }
+            g->objects[i].platform = 1;
+            g->objects[i].collidable = 0;
+            g->objects[i].active = 1;
+            g->objects[i].xOffset = 0;
+            g->objects[i].xCellOff = 0;
+            if ((g->objects[i].direction%2) == 0) {
+                g->objects[i].xOffset = SCREEN_WIDTH;
+                g->objects[i].xCellOff = GAME_GRID_WIDTH;
+            }
+            g->objects[i].yCellOff = i;
+            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            if (g->objects[i].id == 6) g->objects[i].width = X_CELL_PIXEL_SCALE * 2;
+            if (g->objects[i].id == 7) g->objects[i].width = X_CELL_PIXEL_SCALE * 3;
+            if (g->objects[i].id == 8) g->objects[i].width = X_CELL_PIXEL_SCALE * 4;
+            if (g->objects[i].id == 9) g->objects[i].width = X_CELL_PIXEL_SCALE * 5;
+        }
+        for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+            g->valuePacks[i] = initValuePack(i);
+        }
+    }
+
+    if (level == 3) {
+        for (int i = 1; i < NUM_OBJECTS; i++) {
+            if(g->objects[i].id > 6 && i <= 10) {
+                g->objects[i].id = g->objects[i].id - 5;
+                g->objects->platform = 1;
+                g->objects[i].collidable = 1;
+            } else {
+                g->objects->platform = 0;
+                g->objects[i].collidable = 0;
+            }
+            
+            g->objects[i].active = 1;
+            if(i == 10) {
+                g->objects[i].active = 0;
+            }
+            g->objects[i].xOffset = 0;
+            g->objects[i].xCellOff = 0;
+            if ((g->objects[i].direction%2) == 0) {
+                g->objects[i].xOffset = SCREEN_WIDTH;
+                g->objects[i].xCellOff = GAME_GRID_WIDTH;
+            }
+            g->objects[i].yCellOff = i;
+            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            if (g->objects[i].id == 6) g->objects[i].width = X_CELL_PIXEL_SCALE * 2;
+            if (g->objects[i].id == 7) g->objects[i].width = X_CELL_PIXEL_SCALE * 3;
+            if (g->objects[i].id == 8) g->objects[i].width = X_CELL_PIXEL_SCALE * 4;
+            if (g->objects[i].id == 9) g->objects[i].width = X_CELL_PIXEL_SCALE * 5;
+        }
+        for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+            g->valuePacks[i] = initValuePack(i);
+        }
+    }
+
+    if (level == 4) {
+        for (int i = 1; i < NUM_OBJECTS; i++) {
+            if(g->objects[i].id < 6) {
+                g->objects[i].id = g->objects[i].id + 10;
+            } else if(g->objects[i].id >= 6 && g->objects[i].id < 11) {
+                g->objects[i].id = g->objects[i].id + 5;
+            }
+            g->objects->platform = 0;
+            g->objects[i].active = 1;
+            g->objects[i].xOffset = 0;
+            g->objects[i].xCellOff = 0;
+            if ((g->objects[i].direction%2) == 0) {
+                g->objects[i].xOffset = SCREEN_WIDTH;
+                g->objects[i].xCellOff = GAME_GRID_WIDTH;
+            }
+            g->objects[i].yCellOff = i;
+            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+        }
+        for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+            g->valuePacks[i] = initValuePack(i);
         }
     }
 }

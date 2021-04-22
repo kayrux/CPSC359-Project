@@ -28,8 +28,10 @@
 #define	GPSET0	7           //write data line
 #define GPCLR0	10          //clear data line
 
-#define NUM_OBJECTS 16
+
 #define NUM_VALUE_PACKS 4
+#define NUM_OBJECTS 19
+
 #define GAME_GRID_WIDTH 40
 #define GAME_GRID_HEIGHT 20
 #define SCREEN_WIDTH 1280
@@ -167,7 +169,54 @@ void renderObject(struct object *o) {
 }
 
 void render() {
-    levelOnePlayDraw(g.gameMap);                                             // Level One Background
+    if(g.level == 1) {
+        if(g.next == 1) {
+            sleep(1);
+            levelOneLoadDraw();
+            sleep(2);
+            setObjects(g.level, &g);
+            g.next = 0;
+        }
+        levelOnePlayDraw(g.gameMap);                                             // Level One Background
+    }
+    if(g.level == 2) {
+        if(g.next == 1) {
+            sleep(1);
+            levelTwoLoadDraw();
+            sleep(2);
+            setObjects(g.level, &g);
+            g.next = 0;
+        }
+        levelTwoPlayDraw(g.gameMap);                                             // Level One Background
+    }
+    if(g.level == 3) {
+        if(g.next == 1) {
+            sleep(1);
+            levelThreeLoadDraw();
+            sleep(2);
+            setObjects(g.level, &g);
+            g.next = 0;
+        }
+        levelThreePlayDraw(g.gameMap);                                             // Level One Background
+    }
+    if(g.level == 4) {
+        if(g.next == 1) {
+            sleep(1);
+            levelFourLoadDraw();
+            sleep(2);
+            setObjects(g.level, &g);
+            g.next = 0;
+        }
+        levelFourPlayDraw(g.gameMap);                                             // Level One Background
+    }
+    if(g.level == 5) {
+        printf("YOU WIN");
+        g.win = 1;
+        winDraw();
+        sleep(5);
+        resetGameState();
+    }
+    
     for (int i = 1; i < NUM_OBJECTS; i++) {
         if (g.objects[i].active == 1) {renderObject(&g.objects[i]);}  // render Object based on id
     }

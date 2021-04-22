@@ -28,6 +28,7 @@ struct gameState {
     int moves;
     int win;
     int lose;
+    int next;
 	int *buttons;
     int *buttonsPressed;
     struct object *objects;
