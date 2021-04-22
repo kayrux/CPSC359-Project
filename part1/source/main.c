@@ -28,7 +28,10 @@
 #define	GPSET0	7           //write data line
 #define GPCLR0	10          //clear data line
 
+
+#define NUM_VALUE_PACKS 4
 #define NUM_OBJECTS 19
+
 #define GAME_GRID_WIDTH 40
 #define GAME_GRID_HEIGHT 20
 #define SCREEN_WIDTH 1280
@@ -94,6 +97,7 @@ void initGameState() {
     g.buttons = malloc(16 * sizeof(int));
     g.buttonsPressed = malloc(16 * sizeof(int));
     g.objects = malloc(NUM_OBJECTS * sizeof(struct object));
+    g.valuePacks = malloc(NUM_VALUE_PACKS * sizeof(struct object));
     for (int i = 0; i < 16; i ++) {
         g.buttons[i] = 1;
         g.buttonsPressed[i] = 1;
@@ -102,12 +106,18 @@ void initGameState() {
     for (int i = 1; i < NUM_OBJECTS; i++) {
         g.objects[i] = initObject();
     }
+    for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+        g.valuePacks[i] = initValuePack(i);
+    }
     g.gameMap = malloc(1280 * 720 * 2);
 }
 
 void resetGameState() {
     for(int i = 1; i < NUM_OBJECTS; i++) {
         g.objects[i] = initObject();
+    }
+    for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+        g.valuePacks[i] = initValuePack(i);
     }
     setObjects(g.level, &g);
     g.objects[0] = initFrog();
@@ -147,6 +157,9 @@ void updateTime() {
     if ((time(0) - g.sTime) >= 1) {
         g.time ++;
         g.sTime = time(0);
+        for (int i = 0; i < NUM_VALUE_PACKS; i ++) {
+            if (g.time == g.valuePacks[i].spawnTime) g.valuePacks[i].active = 1; // Spawns the value pack at specified time
+        }
     }
     if (g.time >= TIME_LIMIT) gameOver();
 }
@@ -207,13 +220,14 @@ void render() {
     for (int i = 1; i < NUM_OBJECTS; i++) {
         if (g.objects[i].active == 1) {renderObject(&g.objects[i]);}  // render Object based on id
     }
+    for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+        if (g.valuePacks[i].active == 1) {renderObject(&g.valuePacks[i]);}  // render Value Pack based on id
+    }
     drawFrog(g.objects[0].xOffset, g.objects[0].yCellOff, g.gameMap);         // Draw frog
     if (g.lives < 4) coverFrogLives(g.gameMap, g.lives);
     coverTimeBar(g.gameMap, g.time);
     renderScreen(g.gameMap);
 }
-
-
 
 
 /*
