@@ -138,6 +138,21 @@ void gameOver() {
     g.lose = 1;
     g.pause = 1;
     drawEndGame(0);
+    sleep(1);
+    while (!btnPressed) {
+        for (int i = 0; i < 16; i ++) {
+            if (getButtonPress(i) == 0) btnPressed = 1;
+        }
+    }
+}
+
+void gameWon() {
+    int btnPressed = 0;
+    printf("GAME WON\n");
+    g.win = 1;
+    g.pause = 1;
+    drawEndGame(1);
+    sleep(1);
     while (!btnPressed) {
         for (int i = 0; i < 16; i ++) {
             if (getButtonPress(i) == 0) btnPressed = 1;
@@ -146,7 +161,11 @@ void gameOver() {
 }
 
 void checkLoseCondition() {
-    if (g.moves <= 0 || g.lives <= 0 || g.score <= 0) gameOver();
+    if (g.moves <= 0 || g.lives <= 0 || g.score <= 0 || g.time >= TIME_LIMIT) gameOver();
+}
+
+void checkWinCondition() {
+    if(g.level == 5) gameWon();
 }
 
 void updateScore() {
@@ -161,7 +180,6 @@ void updateTime() {
             if (g.time == g.valuePacks[i].spawnTime) g.valuePacks[i].active = 1; // Spawns the value pack at specified time
         }
     }
-    if (g.time >= TIME_LIMIT) gameOver();
 }
 
 void renderObject(struct object *o) {
@@ -209,13 +227,7 @@ void render() {
         }
         levelFourPlayDraw(g.gameMap);                                             // Level One Background
     }
-    if(g.level == 5) {
-        printf("YOU WIN");
-        g.win = 1;
-        winDraw();
-        sleep(5);
-        resetGameState();
-    }
+    
     
     for (int i = 1; i < NUM_OBJECTS; i++) {
         if (g.objects[i].active == 1) {renderObject(&g.objects[i]);}  // render Object based on id
@@ -258,6 +270,7 @@ void update() {
     updateFrog();
     updateScore();
     checkLoseCondition();
+    checkWinCondition();
     if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
 }
 
@@ -272,10 +285,10 @@ void *gameLoop(void *p) {
         while(g.pause) if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
         update();
 		render();
-        if (g.pause && !g.lose) {                    // GAME OVER
+        if (g.pause && !g.lose && !g.win) {                    // GAME OVER
             pauseMenu();
         }
-        if (g.pause && g.lose) {                    // GAME OVER
+        if (g.pause && (g.lose || g.win)) {                    // GAME OVER
             mainMenu();
         }
     }
