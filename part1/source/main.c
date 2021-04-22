@@ -63,6 +63,19 @@ void initTime() {
 }
 
 /*
+* Checks whether the button at the given index was pressed.
+* @param i: the index of the button.
+* @return: returns 0 if the button was pressed. Returns 1 otherwise.
+*/
+int getButtonPress(int i) {
+    if (g.buttonsPressed[i] == 0) {
+        g.buttonsPressed[i] = 1;
+        return 0;
+    }
+    return 1;
+}
+
+/*
 * Initializes the game state.
 * @param: none
 * @return: none
@@ -106,9 +119,16 @@ void resetGameState() {
 }
 
 void gameOver() {
+    int btnPressed = 0;
     printf("GAME OVER\n");
     g.lose = 1;
     g.pause = 1;
+    drawEndGame(0);
+    while (!btnPressed) {
+        for (int i = 0; i < 16; i ++) {
+            if (getButtonPress(i) == 0) btnPressed = 1;
+        }
+    }
 }
 
 void updateTime() {
@@ -135,18 +155,7 @@ void render() {
 }
 
 
-/*
-* Checks whether the button at the given index was pressed.
-* @param i: the index of the button.
-* @return: returns 0 if the button was pressed. Returns 1 otherwise.
-*/
-int getButtonPress(int i) {
-    if (g.buttonsPressed[i] == 0) {
-        g.buttonsPressed[i] = 1;
-        return 0;
-    }
-    return 1;
-}
+
 
 /*
 * Updates the frog's position based on the arrow buttons.
