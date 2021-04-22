@@ -34,7 +34,13 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
+<<<<<<< HEAD
 #define TIME_LIMIT 60
+=======
+#define TIME_LIMIT 180
+#define MOVE_LIMIT 200
+#define SCORE_CONSTANT 20
+>>>>>>> e377334229793ea43bfed0270481e74f5b4e7cb2
 
 
 /*
@@ -63,6 +69,19 @@ void initTime() {
 }
 
 /*
+* Checks whether the button at the given index was pressed.
+* @param i: the index of the button.
+* @return: returns 0 if the button was pressed. Returns 1 otherwise.
+*/
+int getButtonPress(int i) {
+    if (g.buttonsPressed[i] == 0) {
+        g.buttonsPressed[i] = 1;
+        return 0;
+    }
+    return 1;
+}
+
+/*
 * Initializes the game state.
 * @param: none
 * @return: none
@@ -74,6 +93,7 @@ void initGameState() {
     g.score = 0;
     g.lives = 4;
     g.level = 1;
+    g.moves = MOVE_LIMIT;
     initTime();
     g.buttons = malloc(16 * sizeof(int));
     g.buttonsPressed = malloc(16 * sizeof(int));
@@ -101,14 +121,30 @@ void resetGameState() {
     g.score = 0;
     g.lives = 4;
     g.level = 1;
+    g.moves = MOVE_LIMIT;
     
     initTime();
 }
 
 void gameOver() {
+    int btnPressed = 0;
     printf("GAME OVER\n");
     g.lose = 1;
     g.pause = 1;
+    drawEndGame(0);
+    while (!btnPressed) {
+        for (int i = 0; i < 16; i ++) {
+            if (getButtonPress(i) == 0) btnPressed = 1;
+        }
+    }
+}
+
+void checkLoseCondition() {
+    if (g.moves <= 0 || g.lives <= 0 || g.score <= 0) gameOver();
+}
+
+void updateScore() {
+     g.score = ((TIME_LIMIT - g.time) + g.moves + g.lives) * SCORE_CONSTANT;
 }
 
 void winner() {
@@ -171,18 +207,7 @@ void render() {
 }
 
 
-/*
-* Checks whether the button at the given index was pressed.
-* @param i: the index of the button.
-* @return: returns 0 if the button was pressed. Returns 1 otherwise.
-*/
-int getButtonPress(int i) {
-    if (g.buttonsPressed[i] == 0) {
-        g.buttonsPressed[i] = 1;
-        return 0;
-    }
-    return 1;
-}
+
 
 /*
 * Updates the frog's position based on the arrow buttons.
@@ -200,20 +225,18 @@ void frogLifeLost() {
     g.lives -= 1;
     printf("You have lost a life! Frog lives: %d\n", g.lives);
     printf("Time taken: %ld seconds\n", g.time);
-    initTime();         // reset timer
-    if (g.lives <= 0) {
-        gameOver();
-    }
+    //initTime();         // reset timer
 }
 
 void update() {
-
     int collision = updateObjects(&g);
     if (collision) {
         frogLifeLost();
     }
     updateTime();
     updateFrog();
+    updateScore();
+    checkLoseCondition();
     if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
 }
 

@@ -30,5 +30,6 @@ void coverTimeBar(char *fBuffer, int time);
 void renderScreen(char *gameMap);
 void restartGamePause(char *fBuffer);
 void exitGamePause(char *fBuffer);
+void drawEndGame(int flag);
 
 #endif

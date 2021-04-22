@@ -33,6 +33,7 @@ struct gameState {
     int score;
     int lives;
     int level;
+    int moves;
     int win;
     int lose;
     int next;
@@ -62,13 +63,16 @@ struct object initObject() {
     o.yCellOff = 0;             // Y Cell position of object
     o.xOffset = 0;              // X pixel position of object
     o.yOffset = 0;              // Y pixel position of object
-    o.width = 32;                // Width of object
-    o.height = 32;               // Height of object
+    o.width = X_CELL_PIXEL_SCALE;                // Width of object
+    o.height = Y_CELL_PIXEL_SCALE;               // Height of object
     o.platform = 0;             // 0 = not a platform. 1 = platform
     o.active = 0;               // 0 = not active. 1 = active
     o.id = ran;                   // [frog, Car3RightBaseClear]
     o.direction = dir;            // 0 = left. 1 = right. 2 = up. 3 = down.
     o.speed = speed;                // Speed of the object
+
+    if (o.id == 5) o.width = X_CELL_PIXEL_SCALE * 2;
+
     return o;
 }
 
@@ -87,6 +91,7 @@ struct object initFrog() {
     o.id = 0;                                       // [frog, Car3RightBaseClear]
     o.direction = 0;                                // 0 = left. 1 = right. 2 = up. 3 = down.
     o.speed = 3;                                    // Speed of the object
+
     return o;
 }
 
@@ -111,34 +116,35 @@ void resetFrogLocation(struct object *frog) {
 * @return: none
 */
 void updateFrogLocation(int buttonPress, struct gameState *g) {
+    int moveMade = 0;
     switch (buttonPress) {
         case 0:     //UP
             if (g->objects[0].yCellOff > 0) {
                 g->objects[0].yCellOff -= 1;
                 g->objects[0].yOffset -= Y_CELL_PIXEL_SCALE;
             }
+            moveMade = 1;
             break;
         case 1:     //DOWN
             if ((g->objects[0].yCellOff + 1) < GAME_GRID_HEIGHT) {
                 g->objects[0].yCellOff += 1;
                 g->objects[0].yOffset += Y_CELL_PIXEL_SCALE;
             }
+            moveMade = 1;
             break;
         case 2:     //LEFT
-            if (g->objects[0].xOffset > 0) {
-                g->objects[0].xCellOff -= 1;
-                g->objects[0].xOffset -= X_CELL_PIXEL_SCALE;
-                if (g->objects[0].xOffset < 0) {
-                    g->objects[0].xOffset = 0;
-                    g->objects[0].xCellOff = 0;
-                }
+            g->objects[0].xCellOff -= 1;
+            g->objects[0].xOffset -= X_CELL_PIXEL_SCALE;
+            if (g->objects[0].xOffset < 0) {
+                g->objects[0].xOffset = 0;
+                g->objects[0].xCellOff = 0;
             }
+            moveMade = 1;
             break;
         case 3:     //RIGHT
-            if ((g->objects[0].xOffset) < SCREEN_WIDTH - X_CELL_PIXEL_SCALE) {
-                g->objects[0].xOffset += X_CELL_PIXEL_SCALE;
-                if (g->objects[0].xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) g->objects[0].xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE;
-            }
+            g->objects[0].xOffset += X_CELL_PIXEL_SCALE;
+            if (g->objects[0].xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) g->objects[0].xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE;
+            moveMade = 1;
             break;
     }
     printf("%d\n",g->objects[0].yCellOff);
@@ -150,6 +156,9 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
             g->next = 1;
             resetFrogLocation(&g->objects[0]);
         }
+    }
+    if (moveMade) {
+        g->moves -= 1;
     }
 }
 
@@ -169,10 +178,25 @@ int checkCollision(struct object *o, struct object *frog) {
     return 0;
 }
 
+void frogOnPlatform(struct object *o, struct object *frog) {
+    if ((o->xOffset + (o->width / 2) < frog->xOffset + frog->width) &&
+        ((o->xOffset + o-> width) - (o->width / 4) > frog->xOffset)) {
+        int frogOffset = o->speed;
+        if (o->direction == 0) frogOffset = frogOffset * -1;
+        frog->xOffset += frogOffset;
+        if (frog->xOffset < 0) frog->xOffset = 0;  
+        if (frog->xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) frog->xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE; 
+    }
+
+}
+
 int updateObjects(struct gameState *g) {
     for (int i = 1; i < NUM_OBJECTS; i++) {
         if (g->objects[i].active == 1) {            // Updates the object if it is active
             updateLocation(&g->objects[i]);
+            if ((g->objects[i].platform) && (g->objects[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
+                frogOnPlatform(&g->objects[i], &g->objects[0]);
+            }
             if ((g->objects[i].collidable == 1) && (g->objects[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if (checkCollision(&g->objects[i], &g->objects[0]) == 1) {
                     return 1;
