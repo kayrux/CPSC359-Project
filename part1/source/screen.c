@@ -29,6 +29,7 @@
 #include <res/Car3RightBaseClear.h>
 #include <res/Car4RightBaseClear.h>
 #include <res/Car5LeftBaseClear.h>
+#include <res/Bonus.h>
 
 #define X_CELL_PIXEL_SCALE 32
 #define Y_CELL_PIXEL_SCALE 32
@@ -132,6 +133,10 @@ void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer
 		imagePtr=(short int *) ImageCar5LeftBaseClear.pixel_data;
 		height = ImageCar5LeftBaseClear.height;
 		width = ImageCar5LeftBaseClear.width;
+	} else if (id == 10) {
+		imagePtr=(short int *) bonusImage.pixel_data;
+		height = bonusImage.height;
+		width = bonusImage.width;
 	}
 	 
 

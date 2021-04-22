@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#define NUM_OBJECTS 14
+#define NUM_OBJECTS 16
+#define NUM_VALUE_PACKS 4
 #define GAME_GRID_WIDTH 40
 #define GAME_GRID_HEIGHT 20
 #define X_CELL_PIXEL_SCALE 32
@@ -24,6 +25,7 @@ struct object {
     int id;
     int direction;
     int speed;
+    int spawnTime;
 };
 
 //A structure containing variables which are shared between all threads
@@ -39,11 +41,36 @@ struct gameState {
 	int *buttons;
     int *buttonsPressed;
     struct object *objects;
+    struct object *valuePacks;
     int **gameMap;
 	long time;
     long sTime;
     char* fBuffer;
 };
+
+struct object initValuePack(int num) {
+    struct object o;
+    o.collidable = 1;           // 0 = not collidable. 1 = collidable 
+    o.xStart = 0;               // Used for objects partway through the screen
+    o.xCellOff = rand() % GAME_GRID_WIDTH;             // X cell position of object
+    o.yCellOff = rand() % GAME_GRID_HEIGHT;             // Y Cell position of object
+    o.xOffset = o.xCellOff * X_CELL_PIXEL_SCALE;              // X pixel position of object
+    o.yOffset = o.yCellOff * Y_CELL_PIXEL_SCALE;              // Y pixel position of object
+    o.width = X_CELL_PIXEL_SCALE;                // Width of object
+    o.height = Y_CELL_PIXEL_SCALE;               // Height of object
+    o.platform = 0;             // 0 = not a platform. 1 = platform
+    o.active = 0;               // 0 = not active. 1 = active
+    o.id = 10;                   // bonus pack
+    o.direction = 0;            // 0 = left. 1 = right. 2 = up. 3 = down.
+    o.speed = 0;                // Speed of the object
+    if (num == 0) {
+        o.spawnTime = rand() % 11 + 25;
+    } else {
+        o.spawnTime = rand() % 170 + 25;            // When the object spawns
+    }
+    printf("Spawn time: %d\n", o.spawnTime);
+    return o;
+}
 
 struct object initObject() {
     struct object o;
@@ -69,7 +96,7 @@ struct object initObject() {
     o.id = ran;                   // [frog, Car3RightBaseClear]
     o.direction = dir;            // 0 = left. 1 = right. 2 = up. 3 = down.
     o.speed = speed;                // Speed of the object
-
+    o.spawnTime = 0;            // When the object spawns
     if (o.id == 5) o.width = X_CELL_PIXEL_SCALE * 2;
 
     return o;
@@ -141,8 +168,12 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
             moveMade = 1;
             break;
         case 3:     //RIGHT
+            g->objects[0].xCellOff += 1;
             g->objects[0].xOffset += X_CELL_PIXEL_SCALE;
-            if (g->objects[0].xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) g->objects[0].xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE;
+            if (g->objects[0].xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) {
+                g->objects[0].xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE;
+                g->objects[0].xCellOff = GAME_GRID_WIDTH - 1;
+            }
             moveMade = 1;
             break;
     }
@@ -160,7 +191,7 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
 int checkCollision(struct object *o, struct object *frog) {
     if ((o->xOffset < frog->xOffset + frog->width) &&
         (o->xOffset + o->width > frog->xOffset)) {
-            resetFrogLocation(frog);
+            
             printf("Collision! Object: (%d, %d), Frog(%d, %d)\n", o->xOffset, o->yOffset, frog->xOffset, frog->yOffset);
             return 1;
     }
@@ -188,7 +219,18 @@ int updateObjects(struct gameState *g) {
             }
             if ((g->objects[i].collidable == 1) && (g->objects[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if (checkCollision(&g->objects[i], &g->objects[0]) == 1) {
+                    resetFrogLocation(&g->objects[0]);
                     return 1;
+                }
+            }
+        }  
+    }
+    for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+        if (g->valuePacks[i].active == 1) {            // Updates the object if it is active
+            if ((g->valuePacks[i].collidable == 1) && (g->valuePacks[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
+                if (checkCollision(&g->valuePacks[i], &g->objects[0]) == 1) {
+                    g->valuePacks[i].active = 0;
+                    g->score += 200;
                 }
             }
         }  
