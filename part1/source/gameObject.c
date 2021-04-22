@@ -147,7 +147,6 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
             moveMade = 1;
             break;
     }
-    printf("%d\n",g->objects[0].yCellOff);
     if (g->objects[0].yCellOff == -1) {
         g->level++;
         g->next = 1;
@@ -271,7 +270,7 @@ void setObjects(int level, struct gameState *g) {
 
     if (level == 3) {
         for (int i = 1; i < NUM_OBJECTS; i++) {
-            if(g->objects[i].id > 6 && i < NUM_OBJECTS/2) {
+            if(g->objects[i].id > 6 && i <= 10) {
                 g->objects[i].id = g->objects[i].id - 5;
                 g->objects->platform = 1;
             } else {
