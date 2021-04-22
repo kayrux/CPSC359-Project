@@ -50,11 +50,11 @@
 
 
 // The coordinates of frog life images
-#define FROG_LIFE_Y_COORD 656
-#define FROG_LIFE_0_X_COORD 123
-#define FROG_LIFE_1_X_COORD 83
-#define FROG_LIFE_2_X_COORD 43
-#define FROG_LIFE_3_X_COORD 0
+#define FROG_LIFE_Y_COORD 670
+#define FROG_LIFE_0_X_COORD 146
+#define FROG_LIFE_1_X_COORD 114
+#define FROG_LIFE_2_X_COORD 82
+#define FROG_LIFE_3_X_COORD 50
 
 // The coordinates for the time bar
 #define TIME_BAR_Y_COORD 654

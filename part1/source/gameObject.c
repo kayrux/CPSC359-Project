@@ -29,6 +29,7 @@ struct object {
     int spawnTime;
 };
 
+int getWidth(int id, int level);
 //A structure containing variables which are shared between all threads
 struct gameState {
 	int run;
@@ -99,8 +100,8 @@ struct object initObject() {
     o.direction = dir;            // 0 = left. 1 = right. 2 = up. 3 = down.
     o.speed = speed;                // Speed of the object
     o.spawnTime = 0;            // When the object spawns
-    if (o.id == 5) o.width = X_CELL_PIXEL_SCALE * 2;
-    
+    //if (o.id == 5) o.width = X_CELL_PIXEL_SCALE * 2;
+    o.width = getWidth(o.id, 1);
 
     return o;
 }
@@ -126,6 +127,42 @@ struct object initFrog() {
 
 void updateLocation(struct object *o);
 
+int getWidth(int id, int level) {
+    if (level == 1) {
+        if (id == 5 ) return X_CELL_PIXEL_SCALE * 2;
+        else return X_CELL_PIXEL_SCALE;
+    } else if (level == 2) {
+        switch (id) {
+            case 6:
+                return X_CELL_PIXEL_SCALE * 2;
+            case 7:
+                return X_CELL_PIXEL_SCALE * 3;
+            case 8:
+                return X_CELL_PIXEL_SCALE * 4;
+            case 9:
+                return X_CELL_PIXEL_SCALE * 5;
+        }
+    } else if (level == 3) {
+        switch (id) {
+            case 6:
+                return X_CELL_PIXEL_SCALE * 2;
+            case 7:
+                return X_CELL_PIXEL_SCALE * 3;
+            case 8:
+                return X_CELL_PIXEL_SCALE * 4;
+            case 9:
+                return X_CELL_PIXEL_SCALE * 5;
+        }
+    }  else if (level == 4) {
+        switch (id) {
+            case 12:
+                return X_CELL_PIXEL_SCALE * 2;
+            case 14:
+                return X_CELL_PIXEL_SCALE * 3;
+        }
+    }
+    return X_CELL_PIXEL_SCALE;
+}
 /*
 * Resets the frogs location to the bottom center of the screen.
 * @param frog: The frog object.
@@ -180,16 +217,18 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
             moveMade = 1;
             break;
     }
-    if (g->objects[0].yCellOff == -1) {
+    if (g->objects[0].yCellOff == -1) {     // Next level
         g->level++;
         g->next = 1;
         resetFrogLocation(&g->objects[0]);
     }
-    if (g->objects[0].yCellOff == 20 && g->level > 1) {
+    if (g->objects[0].yCellOff == 20 && g->level > 1) {     // Previous level
         g->level--;
         g->next = 1;
         g->objects[0].yCellOff = 0;
+        g->objects[0].yOffset = 0;
         g->objects[0].xCellOff = 19;
+        g->objects[0].xOffset = g->objects[0].xCellOff * X_CELL_PIXEL_SCALE;
     }
     if (moveMade) {
         g->moves -= 1;
@@ -275,14 +314,18 @@ void updateLocation(struct object *o) {
 }
 
 
-
+/* 
+* Updates the location of the given object based on direction, current location, and speed.
+* @param *o: The object to update.
+* @return: none.
+*/
 void setObjects(int level, struct gameState *g) {
     if (level == 1) {
         for (int i = 1; i < NUM_OBJECTS; i++) {
             if(g->objects[i].id > 5) {
                 g->objects[i].id = g->objects[i].id - 5;
             }
-            
+            g->objects[i].width = getWidth(g->objects[i].id, level);
             g->objects[i].active = 1;
             g->objects[i].xOffset = 0;
             g->objects[i].xCellOff = 0;
@@ -293,6 +336,7 @@ void setObjects(int level, struct gameState *g) {
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
             g->objects[i].collidable = 1;
+            printf("collidable\n");
             g->objects[i].platform = 0;
         }
         for (int i = 0; i < NUM_VALUE_PACKS; i++) {
@@ -316,10 +360,7 @@ void setObjects(int level, struct gameState *g) {
             }
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
-            if (g->objects[i].id == 6) g->objects[i].width = X_CELL_PIXEL_SCALE * 2;
-            if (g->objects[i].id == 7) g->objects[i].width = X_CELL_PIXEL_SCALE * 3;
-            if (g->objects[i].id == 8) g->objects[i].width = X_CELL_PIXEL_SCALE * 4;
-            if (g->objects[i].id == 9) g->objects[i].width = X_CELL_PIXEL_SCALE * 5;
+            g->objects[i].width = getWidth(g->objects[i].id, level);
         }
         for (int i = 0; i < NUM_VALUE_PACKS; i++) {
             g->valuePacks[i] = initValuePack(i);
@@ -349,10 +390,7 @@ void setObjects(int level, struct gameState *g) {
             }
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
-            if (g->objects[i].id == 6) g->objects[i].width = X_CELL_PIXEL_SCALE * 2;
-            if (g->objects[i].id == 7) g->objects[i].width = X_CELL_PIXEL_SCALE * 3;
-            if (g->objects[i].id == 8) g->objects[i].width = X_CELL_PIXEL_SCALE * 4;
-            if (g->objects[i].id == 9) g->objects[i].width = X_CELL_PIXEL_SCALE * 5;
+            g->objects[i].width = getWidth(g->objects[i].id, level);
         }
         for (int i = 0; i < NUM_VALUE_PACKS; i++) {
             g->valuePacks[i] = initValuePack(i);
@@ -366,7 +404,8 @@ void setObjects(int level, struct gameState *g) {
             } else if(g->objects[i].id >= 6 && g->objects[i].id < 11) {
                 g->objects[i].id = g->objects[i].id + 5;
             }
-            g->objects->platform = 0;
+            g->objects[i].platform = 0;
+            g->objects[i].collidable = 1;
             g->objects[i].active = 1;
             g->objects[i].xOffset = 0;
             g->objects[i].xCellOff = 0;
@@ -376,6 +415,7 @@ void setObjects(int level, struct gameState *g) {
             }
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            g->objects[i].width = getWidth(g->objects[i].id, level);
         }
         for (int i = 0; i < NUM_VALUE_PACKS; i++) {
             g->valuePacks[i] = initValuePack(i);
