@@ -28,13 +28,13 @@
 #define	GPSET0	7           //write data line
 #define GPCLR0	10          //clear data line
 
-#define NUM_OBJECTS 16
+#define NUM_OBJECTS 19
 #define GAME_GRID_WIDTH 40
 #define GAME_GRID_HEIGHT 20
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
-#define TIME_LIMIT 45
+#define TIME_LIMIT 60
 
 
 /*
@@ -111,6 +111,12 @@ void gameOver() {
     g.pause = 1;
 }
 
+void winner() {
+    printf("YOU WIN");
+    g.win = 1;
+    g.pause = 1;
+}
+
 void updateTime() {
     if ((time(0) - g.sTime) >= 1) {
         g.time ++;
@@ -124,7 +130,37 @@ void renderObject(struct object *o) {
 }
 
 void render() {
-    levelOnePlayDraw(g.gameMap);                                             // Level One Background
+    if(g.level == 1) {
+        levelOnePlayDraw(g.gameMap);                                             // Level One Background
+    }
+    if(g.level == 2) {
+        if(g.next == 1) {
+            sleep(1);
+            levelTwoLoadDraw();
+            sleep(2);
+            g.next = 0;
+        }
+        levelTwoPlayDraw(g.gameMap);                                             // Level One Background
+    }
+    if(g.level == 3) {
+        if(g.next == 1) {
+            sleep(1);
+            levelThreeLoadDraw();
+            sleep(2);
+            g.next = 0;
+        }
+        levelThreePlayDraw(g.gameMap);                                             // Level One Background
+    }
+    if(g.level == 4) {
+        if(g.next == 1) {
+            sleep(1);
+            levelFourLoadDraw();
+            sleep(2);
+            g.next = 0;
+        }
+        levelFourPlayDraw(g.gameMap);                                             // Level One Background
+    }
+    
     for (int i = 1; i < NUM_OBJECTS; i++) {
         if (g.objects[i].active == 1) {renderObject(&g.objects[i]);}  // render Object based on id
     }
@@ -197,6 +233,10 @@ void *gameLoop(void *p) {
         }
         if (g.pause && g.lose) {                    // GAME OVER
             mainMenu();
+        }
+        if (g.pause && g.win) {
+            winDraw();
+            
         }
     }
     pthread_exit(NULL);

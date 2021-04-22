@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#define NUM_OBJECTS 14
+#define NUM_OBJECTS 19
 #define GAME_GRID_WIDTH 40
 #define GAME_GRID_HEIGHT 20
 #define X_CELL_PIXEL_SCALE 32
@@ -35,6 +35,7 @@ struct gameState {
     int level;
     int win;
     int lose;
+    int next;
 	int *buttons;
     int *buttonsPressed;
     struct object *objects;
@@ -140,6 +141,16 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
             }
             break;
     }
+    printf("%d\n",g->objects[0].yCellOff);
+    if (g->objects[0].yCellOff == 0) {
+        if(g->level > 4) {
+            winner();
+        } else {
+            g->level++;
+            g->next = 1;
+            resetFrogLocation(&g->objects[0]);
+        }
+    }
 }
 
 /* Collision detection modified from https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
@@ -206,8 +217,8 @@ void setObjects(int level, struct gameState *g) {
                 g->objects[i].xOffset = SCREEN_WIDTH;
                 g->objects[i].xCellOff = GAME_GRID_WIDTH;
             }
-            g->objects[i].yCellOff = i+2;
-            g->objects[i].yOffset = (i+2) * Y_CELL_PIXEL_SCALE;
+            g->objects[i].yCellOff = i;
+            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
         }
     }
 }

@@ -14,10 +14,17 @@ void writePixel(Pixel *pixel, char *fBuffer);
 void clear();
 
 void drawStart();
+void winDraw();
 void mainMenuDrawStart();
 void mainMenuDrawExit();
 void levelOneLoadDraw();
 void levelOnePlayDraw(char *gameMap);
+void levelTwoLoadDraw();
+void levelTwoPlayDraw(char *gameMap);
+void levelThreeLoadDraw();
+void levelThreePlayDraw(char *gameMap);
+void levelFourLoadDraw();
+void levelFourPlayDraw(char *gameMap);
 void coverFrogLives(char *fBuffer, int frogLives);
 void coverTimeBar(char *fBuffer, int time);
 void renderScreen(char *gameMap);

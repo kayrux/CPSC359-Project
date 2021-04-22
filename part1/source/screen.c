@@ -15,10 +15,15 @@
 #include <res/largeLog.h>
 #include <res/selectStart.h>
 #include <res/selectExit.h>
-#include <res/levelOneLoad.h>
-#include <res/levelOnePlay.h>
-#include <res/LevelTwoLoad.h>
-#include <res/LevelTwoPlay.h>
+#include <res/numberMap.h>
+#include <res/LevelOne.h>
+#include <res/LevelTwo.h>
+#include <res/LevelThree.h>
+#include <res/LevelFour.h>
+#include <res/LevelOneIntro.h>
+#include <res/LevelTwoIntro.h>
+#include <res/LevelThreeIntro.h>
+#include <res/LevelFourIntro.h>
 #include <res/FrogUpBase.h>
 #include <res/PauseRestart.h>
 #include <res/PauseExit.h>
@@ -224,7 +229,7 @@ void mainMenuDrawExit() {
 }
 
 void levelOneLoadDraw() {
-	short int *alienPtr=(short int *) levelOneImage.pixel_data;
+	short int *alienPtr=(short int *) levelOneIntroImage.pixel_data;
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
@@ -245,7 +250,7 @@ void levelOneLoadDraw() {
 }
 
 void levelOnePlayDraw(char *fBuffer) {
-	short int *alienPtr=(short int *) levelOnePlayImage.pixel_data;
+	short int *alienPtr=(short int *) levelOneImage.pixel_data;
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
@@ -257,6 +262,174 @@ void levelOnePlayDraw(char *fBuffer) {
 			pixel->x = x;
 			pixel->y = y;
 			writePixel(pixel, fBuffer);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
+
+void levelTwoLoadDraw() {
+	short int *alienPtr=(short int *) levelTwoIntroImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	
+	int i=0;
+	for (int y = 0; y < 720; y++) { 
+		for (int x = 0; x < 1280; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
+
+void levelTwoPlayDraw(char *fBuffer) {
+	short int *alienPtr=(short int *) levelTwoImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	
+	int i=0;
+	for (int y = 0; y < 720; y++) {
+		for (int x = 0; x < 1280; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			writePixel(pixel, fBuffer);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
+
+void levelThreeLoadDraw() {
+	short int *alienPtr=(short int *) levelThreeIntroImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	
+	int i=0;
+	for (int y = 0; y < 720; y++) { 
+		for (int x = 0; x < 1280; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
+
+void levelThreePlayDraw(char *fBuffer) {
+	short int *alienPtr=(short int *) levelThreeImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	
+	int i=0;
+	for (int y = 0; y < 720; y++) {
+		for (int x = 0; x < 1280; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			writePixel(pixel, fBuffer);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
+
+void levelFourLoadDraw() {
+	short int *alienPtr=(short int *) levelFourIntroImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	
+	int i=0;
+	for (int y = 0; y < 720; y++) { 
+		for (int x = 0; x < 1280; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
+
+void levelFourPlayDraw(char *fBuffer) {
+	short int *alienPtr=(short int *) levelFourImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	
+	int i=0;
+	for (int y = 0; y < 720; y++) {
+		for (int x = 0; x < 1280; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			writePixel(pixel, fBuffer);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
+
+void winDraw() {
+	short int *alienPtr=(short int *) winnerImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	
+	int i=0;
+	for (int y = 0; y < 720; y++) { 
+		for (int x = 0; x < 1280; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
+			i++;
+		}
+	}
+	/* free pixel's allocated memory */
+	free(pixel);
+	pixel = NULL;
+}
+
+void loseDraw() {
+	short int *alienPtr=(short int *) gameOverImage.pixel_data;
+	/* initialize a pixel */
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	
+	int i=0;
+	for (int y = 0; y < 720; y++) { 
+		for (int x = 0; x < 1280; x++) {
+			pixel->color = alienPtr[i]; 
+			pixel->x = x;
+			pixel->y = y;
+			drawPixel(pixel);
 			i++;
 		}
 	}
