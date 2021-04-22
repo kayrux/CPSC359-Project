@@ -34,13 +34,9 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
-<<<<<<< HEAD
-#define TIME_LIMIT 60
-=======
 #define TIME_LIMIT 180
 #define MOVE_LIMIT 200
 #define SCORE_CONSTANT 20
->>>>>>> e377334229793ea43bfed0270481e74f5b4e7cb2
 
 
 /*
@@ -147,12 +143,6 @@ void updateScore() {
      g.score = ((TIME_LIMIT - g.time) + g.moves + g.lives) * SCORE_CONSTANT;
 }
 
-void winner() {
-    printf("YOU WIN");
-    g.win = 1;
-    g.pause = 1;
-}
-
 void updateTime() {
     if ((time(0) - g.sTime) >= 1) {
         g.time ++;
@@ -167,6 +157,13 @@ void renderObject(struct object *o) {
 
 void render() {
     if(g.level == 1) {
+        if(g.next == 1) {
+            sleep(1);
+            levelOneLoadDraw();
+            sleep(2);
+            setObjects(g.level, &g);
+            g.next = 0;
+        }
         levelOnePlayDraw(g.gameMap);                                             // Level One Background
     }
     if(g.level == 2) {
@@ -174,6 +171,7 @@ void render() {
             sleep(1);
             levelTwoLoadDraw();
             sleep(2);
+            setObjects(g.level, &g);
             g.next = 0;
         }
         levelTwoPlayDraw(g.gameMap);                                             // Level One Background
@@ -183,6 +181,7 @@ void render() {
             sleep(1);
             levelThreeLoadDraw();
             sleep(2);
+            setObjects(g.level, &g);
             g.next = 0;
         }
         levelThreePlayDraw(g.gameMap);                                             // Level One Background
@@ -192,9 +191,17 @@ void render() {
             sleep(1);
             levelFourLoadDraw();
             sleep(2);
+            setObjects(g.level, &g);
             g.next = 0;
         }
         levelFourPlayDraw(g.gameMap);                                             // Level One Background
+    }
+    if(g.level == 5) {
+        printf("YOU WIN");
+        g.win = 1;
+        winDraw();
+        sleep(5);
+        resetGameState();
     }
     
     for (int i = 1; i < NUM_OBJECTS; i++) {
@@ -256,10 +263,6 @@ void *gameLoop(void *p) {
         }
         if (g.pause && g.lose) {                    // GAME OVER
             mainMenu();
-        }
-        if (g.pause && g.win) {
-            winDraw();
-            
         }
     }
     pthread_exit(NULL);

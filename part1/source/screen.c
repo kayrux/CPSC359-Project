@@ -5,6 +5,11 @@
 #include <string.h>
 
 // res folder
+#include <res/spaceOrb.h>
+#include <res/spaceSnake.h>
+#include <res/spaceCroc.h>
+#include <res/spaceTurtle.h>
+#include <res/spaceOtter.h>
 #include <res/snakeImage.h>
 #include <res/otterImage.h>
 #include <res/crocImage.h>
@@ -13,6 +18,7 @@
 #include <res/smallLog.h>
 #include <res/mediumLog.h>
 #include <res/largeLog.h>
+#include <res/ultraLog.h>
 #include <res/selectStart.h>
 #include <res/selectExit.h>
 #include <res/numberMap.h>
@@ -115,8 +121,8 @@ void drawFrog(int xOffset, int yCellOff, char *fBuffer) {
 
 void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer, int id) {
 	short int *imagePtr=(short int *) ImageCar3RightBaseClear.pixel_data;
-	int height = ImageCar3RightBaseClear.height;
-	int width = ImageCar3RightBaseClear.width;
+	int height = 32;
+	int width = 32;
 	if(id == 1) {
 		imagePtr=(short int *) ImageCar1LeftBaseClear.pixel_data;
 		height = ImageCar1LeftBaseClear.height;
@@ -137,9 +143,48 @@ void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer
 		imagePtr=(short int *) ImageCar5LeftBaseClear.pixel_data;
 		height = ImageCar5LeftBaseClear.height;
 		width = ImageCar5LeftBaseClear.width;
+	} else if(id == 6) {
+		imagePtr=(short int *) smallLogImage.pixel_data;
+		height = smallLogImage.height;
+		width = smallLogImage.width;
+	} else if(id == 7) {
+		imagePtr=(short int *) mediumLogImage.pixel_data;
+		height = mediumLogImage.height;
+		width = mediumLogImage.width;
+	} else if(id == 8) {
+		imagePtr=(short int *) largeLogImage.pixel_data;
+		height = largeLogImage.height;
+		width = largeLogImage.width;
+	} else if(id == 9) {
+		imagePtr=(short int *) ultraLogImage.pixel_data;
+		height = ultraLogImage.height;
+		width = ultraLogImage.width;
+	} else if(id == 10) {
+		imagePtr=(short int *) turtleLandingImage.pixel_data;
+		height = turtleLandingImage.height;
+		width = turtleLandingImage.width;
+	} else if(id == 11) {
+		imagePtr=(short int *) spaceTurtleImage.pixel_data;
+		height = spaceTurtleImage.height;
+		width = spaceTurtleImage.width;
+	} else if(id == 12) {
+		imagePtr=(short int *) spaceSnakeImage.pixel_data;
+		height = spaceSnakeImage.height;
+		width = spaceSnakeImage.width;
+	} else if(id == 13) {
+		imagePtr=(short int *) spaceOtterImage.pixel_data;
+		height = spaceOtterImage.height;
+		width = spaceOtterImage.width;
+	} else if(id == 14) {
+		imagePtr=(short int *) spaceCrocImage.pixel_data;
+		height = spaceCrocImage.height;
+		width = spaceCrocImage.width;
+	} else if(id == 15) {
+		imagePtr=(short int *) spaceOrbImage.pixel_data;
+		height = spaceOrbImage.height;
+		width = spaceOrbImage.width;
 	}
-	 
-
+	
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
 	if (xOffset < 0) xOffset = 0;
@@ -169,13 +214,11 @@ void drawStart() {
 	pixel = malloc(sizeof(Pixel));
 
 	int i=0;
-	printf("Work 1\n");
 	for (int y = 0; y < 720; y++) {
 		for (int x = 0; x < 1280; x++) {	
 				pixel->color = imagePtr[i]; 
 				pixel->x = x;
 				pixel->y = y;
-	
 				drawPixel(pixel);
 				i++;
 		}
@@ -544,11 +587,10 @@ void coverFrogLives(char *fBuffer, int frogLives) {
 	}
 	int i=0;
 	for (int y = 0; y < Y_CELL_PIXEL_SCALE; y++) {
-		for (int x = 0; x <  width; x++) {	
+		for (int x = 0; x <  width; x++) {
 				pixel->color = 0; 
 				pixel->x = x;
 				pixel->y = y + FROG_LIFE_Y_COORD;
-	
 				writePixel(pixel, fBuffer);
 				i++;	
 		}

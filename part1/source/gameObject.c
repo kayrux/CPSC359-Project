@@ -119,14 +119,14 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
     int moveMade = 0;
     switch (buttonPress) {
         case 0:     //UP
-            if (g->objects[0].yCellOff > 0) {
+            if (g->objects[0].yCellOff >= 0) {
                 g->objects[0].yCellOff -= 1;
                 g->objects[0].yOffset -= Y_CELL_PIXEL_SCALE;
             }
             moveMade = 1;
             break;
         case 1:     //DOWN
-            if ((g->objects[0].yCellOff + 1) < GAME_GRID_HEIGHT) {
+            if ((g->objects[0].yCellOff + 1) < GAME_GRID_HEIGHT + 1) {
                 g->objects[0].yCellOff += 1;
                 g->objects[0].yOffset += Y_CELL_PIXEL_SCALE;
             }
@@ -148,14 +148,16 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
             break;
     }
     printf("%d\n",g->objects[0].yCellOff);
-    if (g->objects[0].yCellOff == 0) {
-        if(g->level > 4) {
-            winner();
-        } else {
-            g->level++;
-            g->next = 1;
-            resetFrogLocation(&g->objects[0]);
-        }
+    if (g->objects[0].yCellOff == -1) {
+        g->level++;
+        g->next = 1;
+        resetFrogLocation(&g->objects[0]);
+    }
+    if (g->objects[0].yCellOff == 20 && g->level > 1) {
+        g->level--;
+        g->next = 1;
+        g->objects[0].yCellOff = 0;
+        g->objects[0].xCellOff = 19;
     }
     if (moveMade) {
         g->moves -= 1;
@@ -234,6 +236,71 @@ void updateLocation(struct object *o) {
 void setObjects(int level, struct gameState *g) {
     if (level == 1) {
         for (int i = 1; i < NUM_OBJECTS; i++) {
+            if(g->objects[i].id > 5) {
+                g->objects[i].id = g->objects[i].id - 5;
+            }
+            g->objects[i].active = 1;
+            g->objects[i].xOffset = 0;
+            g->objects[i].xCellOff = 0;
+            if ((g->objects[i].direction%2) == 0) {
+                g->objects[i].xOffset = SCREEN_WIDTH;
+                g->objects[i].xCellOff = GAME_GRID_WIDTH;
+            }
+            g->objects[i].yCellOff = i;
+            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+        }
+    }
+
+    if (level == 2) {
+        for (int i = 1; i < NUM_OBJECTS; i++) {
+            if(g->objects[i].id < 6) {
+                g->objects[i].id = g->objects[i].id + 5;
+            }
+            g->objects[i].platform = 1;
+            g->objects[i].active = 1;
+            g->objects[i].xOffset = 0;
+            g->objects[i].xCellOff = 0;
+            if ((g->objects[i].direction%2) == 0) {
+                g->objects[i].xOffset = SCREEN_WIDTH;
+                g->objects[i].xCellOff = GAME_GRID_WIDTH;
+            }
+            g->objects[i].yCellOff = i;
+            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+        }
+    }
+
+    if (level == 3) {
+        for (int i = 1; i < NUM_OBJECTS; i++) {
+            if(g->objects[i].id > 6 && i < NUM_OBJECTS/2) {
+                g->objects[i].id = g->objects[i].id - 5;
+                g->objects->platform = 1;
+            } else {
+                g->objects->platform = 0;
+            }
+            
+            g->objects[i].active = 1;
+            if(i == 10) {
+                g->objects[i].active = 0;
+            }
+            g->objects[i].xOffset = 0;
+            g->objects[i].xCellOff = 0;
+            if ((g->objects[i].direction%2) == 0) {
+                g->objects[i].xOffset = SCREEN_WIDTH;
+                g->objects[i].xCellOff = GAME_GRID_WIDTH;
+            }
+            g->objects[i].yCellOff = i;
+            g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+        }
+    }
+
+    if (level == 4) {
+        for (int i = 1; i < NUM_OBJECTS; i++) {
+            if(g->objects[i].id < 6) {
+                g->objects[i].id = g->objects[i].id + 10;
+            } else if(g->objects[i].id >= 6 && g->objects[i].id < 11) {
+                g->objects[i].id = g->objects[i].id + 5;
+            }
+            g->objects->platform = 0;
             g->objects[i].active = 1;
             g->objects[i].xOffset = 0;
             g->objects[i].xCellOff = 0;
