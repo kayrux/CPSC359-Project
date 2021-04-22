@@ -33,6 +33,7 @@ struct gameState {
     int score;
     int lives;
     int level;
+    int moves;
     int win;
     int lose;
 	int *buttons;
@@ -114,18 +115,21 @@ void resetFrogLocation(struct object *frog) {
 * @return: none
 */
 void updateFrogLocation(int buttonPress, struct gameState *g) {
+    int moveMade = 0;
     switch (buttonPress) {
         case 0:     //UP
             if (g->objects[0].yCellOff > 0) {
                 g->objects[0].yCellOff -= 1;
                 g->objects[0].yOffset -= Y_CELL_PIXEL_SCALE;
             }
+            moveMade = 1;
             break;
         case 1:     //DOWN
             if ((g->objects[0].yCellOff + 1) < GAME_GRID_HEIGHT) {
                 g->objects[0].yCellOff += 1;
                 g->objects[0].yOffset += Y_CELL_PIXEL_SCALE;
             }
+            moveMade = 1;
             break;
         case 2:     //LEFT
             g->objects[0].xCellOff -= 1;
@@ -134,11 +138,16 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
                 g->objects[0].xOffset = 0;
                 g->objects[0].xCellOff = 0;
             }
+            moveMade = 1;
             break;
         case 3:     //RIGHT
             g->objects[0].xOffset += X_CELL_PIXEL_SCALE;
             if (g->objects[0].xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) g->objects[0].xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE;
+            moveMade = 1;
             break;
+    }
+    if (moveMade) {
+        g->moves -= 1;
     }
 }
 

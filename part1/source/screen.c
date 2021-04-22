@@ -49,7 +49,7 @@
 #define TIME_BAR_X_COORD 197
 #define TIME_BAR_WIDTH 908
 #define TIME_BAR_HEIGHT 36
-#define TIME_LIMIT 45
+#define TIME_LIMIT 180
 #define TIME_SEGMENT (TIME_BAR_WIDTH / TIME_LIMIT)
 
 /* Definitions */

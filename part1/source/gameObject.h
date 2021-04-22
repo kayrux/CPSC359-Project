@@ -24,6 +24,7 @@ struct gameState {
     int score;
     int lives;
     int level;
+    int moves;
     int win;
     int lose;
 	int *buttons;
