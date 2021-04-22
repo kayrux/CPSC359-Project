@@ -302,7 +302,7 @@ void setObjects(int level, struct gameState *g) {
             } else if(g->objects[i].id >= 6 && g->objects[i].id < 11) {
                 g->objects[i].id = g->objects[i].id + 5;
             }
-            g->objects->platform = 0;
+            g->objects[i]->platform = 0;
             g->objects[i].active = 1;
             g->objects[i].xOffset = 0;
             g->objects[i].xCellOff = 0;
