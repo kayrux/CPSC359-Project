@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
+#define NUM_VALUE_PACKS 4
 #define NUM_OBJECTS 19
+
 #define GAME_GRID_WIDTH 40
 #define GAME_GRID_HEIGHT 20
 #define X_CELL_PIXEL_SCALE 32
@@ -24,8 +26,10 @@ struct object {
     int id;
     int direction;
     int speed;
+    int spawnTime;
 };
 
+int getWidth(int id, int level);
 //A structure containing variables which are shared between all threads
 struct gameState {
 	int run;
@@ -40,11 +44,36 @@ struct gameState {
 	int *buttons;
     int *buttonsPressed;
     struct object *objects;
+    struct object *valuePacks;
     int **gameMap;
 	long time;
     long sTime;
     char* fBuffer;
 };
+
+struct object initValuePack(int num) {
+    struct object o;
+    o.collidable = 1;           // 0 = not collidable. 1 = collidable 
+    o.xStart = 0;               // Used for objects partway through the screen
+    o.xCellOff = rand() % GAME_GRID_WIDTH;             // X cell position of object
+    o.yCellOff = rand() % GAME_GRID_HEIGHT;             // Y Cell position of object
+    o.xOffset = o.xCellOff * X_CELL_PIXEL_SCALE;              // X pixel position of object
+    o.yOffset = o.yCellOff * Y_CELL_PIXEL_SCALE;              // Y pixel position of object
+    o.width = X_CELL_PIXEL_SCALE;                // Width of object
+    o.height = Y_CELL_PIXEL_SCALE;               // Height of object
+    o.platform = 0;             // 0 = not a platform. 1 = platform
+    o.active = 0;               // 0 = not active. 1 = active
+    o.id = 16;                   // bonus pack
+    o.direction = 0;            // 0 = left. 1 = right. 2 = up. 3 = down.
+    o.speed = 0;                // Speed of the object
+    if (num == 0) {
+        o.spawnTime = rand() % 11 + 25;
+    } else {
+        o.spawnTime = rand() % 170 + 25;            // When the object spawns
+    }
+    printf("Spawn time: %d\n", o.spawnTime);
+    return o;
+}
 
 struct object initObject() {
     struct object o;
@@ -70,8 +99,9 @@ struct object initObject() {
     o.id = ran;                   // [frog, Car3RightBaseClear]
     o.direction = dir;            // 0 = left. 1 = right. 2 = up. 3 = down.
     o.speed = speed;                // Speed of the object
-
-    if (o.id == 5) o.width = X_CELL_PIXEL_SCALE * 2;
+    o.spawnTime = 0;            // When the object spawns
+    //if (o.id == 5) o.width = X_CELL_PIXEL_SCALE * 2;
+    o.width = getWidth(o.id, 1);
 
     return o;
 }
@@ -97,6 +127,42 @@ struct object initFrog() {
 
 void updateLocation(struct object *o);
 
+int getWidth(int id, int level) {
+    if (level == 1) {
+        if (id == 5 ) return X_CELL_PIXEL_SCALE * 2;
+        else return X_CELL_PIXEL_SCALE;
+    } else if (level == 2) {
+        switch (id) {
+            case 6:
+                return X_CELL_PIXEL_SCALE * 2;
+            case 7:
+                return X_CELL_PIXEL_SCALE * 3;
+            case 8:
+                return X_CELL_PIXEL_SCALE * 4;
+            case 9:
+                return X_CELL_PIXEL_SCALE * 5;
+        }
+    } else if (level == 3) {
+        switch (id) {
+            case 6:
+                return X_CELL_PIXEL_SCALE * 2;
+            case 7:
+                return X_CELL_PIXEL_SCALE * 3;
+            case 8:
+                return X_CELL_PIXEL_SCALE * 4;
+            case 9:
+                return X_CELL_PIXEL_SCALE * 5;
+        }
+    }  else if (level == 4) {
+        switch (id) {
+            case 12:
+                return X_CELL_PIXEL_SCALE * 2;
+            case 14:
+                return X_CELL_PIXEL_SCALE * 3;
+        }
+    }
+    return X_CELL_PIXEL_SCALE;
+}
 /*
 * Resets the frogs location to the bottom center of the screen.
 * @param frog: The frog object.
@@ -142,21 +208,27 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
             moveMade = 1;
             break;
         case 3:     //RIGHT
+            g->objects[0].xCellOff += 1;
             g->objects[0].xOffset += X_CELL_PIXEL_SCALE;
-            if (g->objects[0].xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) g->objects[0].xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE;
+            if (g->objects[0].xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) {
+                g->objects[0].xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE;
+                g->objects[0].xCellOff = GAME_GRID_WIDTH - 1;
+            }
             moveMade = 1;
             break;
     }
-    if (g->objects[0].yCellOff == -1) {
+    if (g->objects[0].yCellOff == -1) {     // Next level
         g->level++;
         g->next = 1;
         resetFrogLocation(&g->objects[0]);
     }
-    if (g->objects[0].yCellOff == 20 && g->level > 1) {
+    if (g->objects[0].yCellOff == 20 && g->level > 1) {     // Previous level
         g->level--;
         g->next = 1;
         g->objects[0].yCellOff = 0;
+        g->objects[0].yOffset = 0;
         g->objects[0].xCellOff = 19;
+        g->objects[0].xOffset = g->objects[0].xCellOff * X_CELL_PIXEL_SCALE;
     }
     if (moveMade) {
         g->moves -= 1;
@@ -172,23 +244,26 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
 int checkCollision(struct object *o, struct object *frog) {
     if ((o->xOffset < frog->xOffset + frog->width) &&
         (o->xOffset + o->width > frog->xOffset)) {
-            resetFrogLocation(frog);
+            
             printf("Collision! Object: (%d, %d), Frog(%d, %d)\n", o->xOffset, o->yOffset, frog->xOffset, frog->yOffset);
             return 1;
     }
     return 0;
 }
 
-void frogOnPlatform(struct object *o, struct object *frog) {
-    if ((o->xOffset + (o->width / 2) < frog->xOffset + frog->width) &&
-        ((o->xOffset + o-> width) - (o->width / 4) > frog->xOffset)) {
+int frogOnPlatform(struct object *o, struct object *frog, int level) {
+    if ((o->xOffset + (X_CELL_PIXEL_SCALE / 2) < frog->xOffset + frog->width) &&
+        ((o->xOffset + o-> width) - (X_CELL_PIXEL_SCALE / 2) > frog->xOffset)) {
         int frogOffset = o->speed;
         if (o->direction == 0) frogOffset = frogOffset * -1;
         frog->xOffset += frogOffset;
         if (frog->xOffset < 0) frog->xOffset = 0;  
-        if (frog->xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) frog->xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE; 
+        if (frog->xOffset > SCREEN_WIDTH - X_CELL_PIXEL_SCALE) frog->xOffset = SCREEN_WIDTH - X_CELL_PIXEL_SCALE;
+        if(level == 2 || level == 3) {
+            return 1;
+        }
     }
-
+    return 0;
 }
 
 int updateObjects(struct gameState *g) {
@@ -196,11 +271,35 @@ int updateObjects(struct gameState *g) {
         if (g->objects[i].active == 1) {            // Updates the object if it is active
             updateLocation(&g->objects[i]);
             if ((g->objects[i].platform) && (g->objects[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
-                frogOnPlatform(&g->objects[i], &g->objects[0]);
+                if(frogOnPlatform(&g->objects[i], &g->objects[0], g->level) == 0){
+                    if(g->objects[0].yCellOff%2 != 1 && g->level == 2) {
+                        if(g->objects[0].yCellOff != 19 && g->objects[0].yCellOff != 0) {
+                            resetFrogLocation(&g->objects[0]);
+                            return 1;
+                        }
+                    }
+                    if(g->objects[0].yCellOff%2 != 1 && g->level == 3 && g->objects[0].yCellOff%2 < 10) {
+                        if(g->objects[0].yCellOff != 19 && g->objects[0].yCellOff != 0) {
+                            resetFrogLocation(&g->objects[0]);
+                            return 1;
+                        }
+                    }
+                }
             }
             if ((g->objects[i].collidable == 1) && (g->objects[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if (checkCollision(&g->objects[i], &g->objects[0]) == 1) {
+                    resetFrogLocation(&g->objects[0]);
                     return 1;
+                }
+            }
+        }  
+    }
+    for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+        if (g->valuePacks[i].active == 1) {            // Updates the object if it is active
+            if ((g->valuePacks[i].collidable == 1) && (g->valuePacks[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
+                if (checkCollision(&g->valuePacks[i], &g->objects[0]) == 1) {
+                    g->valuePacks[i].active = 0;
+                    g->score += 200;
                 }
             }
         }  
@@ -231,13 +330,18 @@ void updateLocation(struct object *o) {
 }
 
 
-
+/* 
+* Updates the location of the given object based on direction, current location, and speed.
+* @param *o: The object to update.
+* @return: none.
+*/
 void setObjects(int level, struct gameState *g) {
     if (level == 1) {
         for (int i = 1; i < NUM_OBJECTS; i++) {
             if(g->objects[i].id > 5) {
                 g->objects[i].id = g->objects[i].id - 5;
             }
+            g->objects[i].width = getWidth(g->objects[i].id, level);
             g->objects[i].active = 1;
             g->objects[i].xOffset = 0;
             g->objects[i].xCellOff = 0;
@@ -247,6 +351,12 @@ void setObjects(int level, struct gameState *g) {
             }
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            g->objects[i].collidable = 1;
+            printf("collidable\n");
+            g->objects[i].platform = 0;
+        }
+        for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+            g->valuePacks[i] = initValuePack(i);
         }
     }
 
@@ -259,15 +369,26 @@ void setObjects(int level, struct gameState *g) {
                 g->objects[i].active = 0;
             }
             g->objects[i].platform = 1;
+            g->objects[i].collidable = 0;
             g->objects[i].active = 1;
             g->objects[i].xOffset = 0;
             g->objects[i].xCellOff = 0;
+            if(i%2 == 1) {
+                g->objects[i].active = 0;
+                if(i == 1) {
+                    g->objects[i].active = 1;
+                }
+            }
             if ((g->objects[i].direction%2) == 0) {
                 g->objects[i].xOffset = SCREEN_WIDTH;
                 g->objects[i].xCellOff = GAME_GRID_WIDTH;
             }
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            g->objects[i].width = getWidth(g->objects[i].id, level);
+        }
+        for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+            g->valuePacks[i] = initValuePack(i);
         }
     }
 
@@ -276,12 +397,14 @@ void setObjects(int level, struct gameState *g) {
             if(g->objects[i].id > 6 && i <= 10) {
                 g->objects[i].id = g->objects[i].id - 5;
                 g->objects->platform = 1;
+                g->objects[i].collidable = 1;
             } else {
                 g->objects->platform = 0;
+                g->objects[i].collidable = 0;
             }
             
             g->objects[i].active = 1;
-            if(i == 10) {
+            if(i == 10 || i == 13 || i == 16) {
                 g->objects[i].active = 0;
             }
             g->objects[i].xOffset = 0;
@@ -292,6 +415,12 @@ void setObjects(int level, struct gameState *g) {
             }
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            g->objects[i].width = getWidth(g->objects[i].id, level);
+            
+        }
+        
+        for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+            g->valuePacks[i] = initValuePack(i);
         }
     }
 
@@ -302,7 +431,8 @@ void setObjects(int level, struct gameState *g) {
             } else if(g->objects[i].id >= 6 && g->objects[i].id < 11) {
                 g->objects[i].id = g->objects[i].id + 5;
             }
-            g->objects[i]->platform = 0;
+            g->objects[i].platform = 0;
+            g->objects[i].collidable = 1;
             g->objects[i].active = 1;
             g->objects[i].xOffset = 0;
             g->objects[i].xCellOff = 0;
@@ -312,6 +442,10 @@ void setObjects(int level, struct gameState *g) {
             }
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
+            g->objects[i].width = getWidth(g->objects[i].id, level);
+        }
+        for (int i = 0; i < NUM_VALUE_PACKS; i++) {
+            g->valuePacks[i] = initValuePack(i);
         }
     }
 }

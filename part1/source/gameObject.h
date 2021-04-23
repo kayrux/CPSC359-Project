@@ -15,6 +15,7 @@ struct object {
     int id;
     int direction;
     int speed;
+    int spawnTime;
 };
 
 //A structure containing variables which are shared between all threads
@@ -31,6 +32,7 @@ struct gameState {
 	int *buttons;
     int *buttonsPressed;
     struct object *objects;
+    struct object *valuePacks;
 	long time;
     long sTime;
     char* gameMap;
@@ -38,6 +40,7 @@ struct gameState {
 
 //void renderObject(struct object *o);
 struct object initObject();
+struct object initValuePack(int num);
 struct object initFrog();
 void updateFrogLocation(int buttonPress, struct gameState *g);
 int updateObjects(struct gameState *g);

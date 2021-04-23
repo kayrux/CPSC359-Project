@@ -40,6 +40,7 @@
 #include <res/Car3RightBaseClear.h>
 #include <res/Car4RightBaseClear.h>
 #include <res/Car5LeftBaseClear.h>
+#include <res/Bonus.h>
 
 #define X_CELL_PIXEL_SCALE 32
 #define Y_CELL_PIXEL_SCALE 32
@@ -49,11 +50,11 @@
 
 
 // The coordinates of frog life images
-#define FROG_LIFE_Y_COORD 656
-#define FROG_LIFE_0_X_COORD 123
-#define FROG_LIFE_1_X_COORD 83
-#define FROG_LIFE_2_X_COORD 43
-#define FROG_LIFE_3_X_COORD 0
+#define FROG_LIFE_Y_COORD 670
+#define FROG_LIFE_0_X_COORD 146
+#define FROG_LIFE_1_X_COORD 114
+#define FROG_LIFE_2_X_COORD 82
+#define FROG_LIFE_3_X_COORD 50
 
 // The coordinates for the time bar
 #define TIME_BAR_Y_COORD 654
@@ -183,6 +184,10 @@ void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer
 		imagePtr=(short int *) spaceOrbImage.pixel_data;
 		height = spaceOrbImage.height;
 		width = spaceOrbImage.width;
+	}  else if (id == 16) {
+		imagePtr=(short int *) bonusImage.pixel_data;
+		height = bonusImage.height;
+		width = bonusImage.width;
 	}
 	
 	Pixel *pixel;
@@ -469,7 +474,7 @@ void winDraw() {
 	pixel = malloc(sizeof(Pixel));
 	
 	int i=0;
-	for (int y = 0; y < 720; y++) { 
+	for (int y = 0; y < 640; y++) { 
 		for (int x = 0; x < 1280; x++) {
 			pixel->color = imagePtr[i]; 
 			pixel->x = x;
@@ -490,7 +495,7 @@ void loseDraw() {
 	pixel = malloc(sizeof(Pixel));
 	
 	int i=0;
-	for (int y = 0; y < 720; y++) { 
+	for (int y = 0; y < 640; y++) { 
 		for (int x = 0; x < 1280; x++) {
 			pixel->color = imagePtr[i]; 
 			pixel->x = x;
