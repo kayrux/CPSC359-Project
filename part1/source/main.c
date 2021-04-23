@@ -29,7 +29,7 @@
 #define GPCLR0	10          //clear data line
 
 
-#define NUM_VALUE_PACKS 4
+#define NUM_VALUE_PACKS 6
 #define NUM_OBJECTS 19
 
 #define GAME_GRID_WIDTH 40
@@ -60,6 +60,7 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
 
 struct gameState g;
 void mainMenu();
+void frogLifeLost();
 void pauseMenu();
 
 void initTime() {
@@ -208,6 +209,9 @@ void render() {
             setObjects(g.level, &g);
             g.next = 0;
         }
+        for (int i = 0; i < NUM_OBJECTS; i++) {
+            
+        }
         levelTwoPlayDraw(g.gameMap);                                             // Level One Background
     }
     if(g.level == 3) {
@@ -236,7 +240,10 @@ void render() {
         if (g.objects[i].active == 1) {renderObject(&g.objects[i]);}  // render Object based on id
     }
     for (int i = 0; i < NUM_VALUE_PACKS; i++) {
-        if (g.valuePacks[i].active == 1) {renderObject(&g.valuePacks[i]);}  // render Value Pack based on id
+        if (g.valuePacks[i].active == 1) {
+            g.valuePacks[i].id = g.level + 15; // render Value Pack based on id
+            renderObject(&g.valuePacks[i]);
+        }  
     }
     drawFrog(g.objects[0].xOffset, g.objects[0].yCellOff, g.gameMap);         // Draw frog
     if (g.lives < 4) coverFrogLives(g.gameMap, g.lives);
@@ -259,11 +266,15 @@ void updateFrog() {
     else if (getButtonPress(7) == 0) updateFrogLocation(3, &g);    // RIGHT
 }
 
+/*
+* Decreases the frog lives by 1.
+* @param: none
+* @return: none
+*/
 void frogLifeLost() {
     g.lives -= 1;
     printf("You have lost a life! Frog lives: %d\n", g.lives);
     printf("Time taken: %ld seconds\n", g.time);
-    //initTime();         // reset timer
 }
 
 void update() {

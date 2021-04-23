@@ -41,6 +41,10 @@
 #include <res/Car4RightBaseClear.h>
 #include <res/Car5LeftBaseClear.h>
 #include <res/Bonus.h>
+#include <res/Flies1.h>
+#include <res/Flies2.h>
+#include <res/Flies3.h>
+#include <res/Flies4.h>
 
 #define X_CELL_PIXEL_SCALE 32
 #define Y_CELL_PIXEL_SCALE 32
@@ -191,9 +195,21 @@ void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer
 		height = spaceOrbImage.height;
 		width = spaceOrbImage.width;
 	}  else if (id == 16) {
-		imagePtr=(short int *) bonusImage.pixel_data;
-		height = bonusImage.height;
-		width = bonusImage.width;
+		imagePtr=(short int *) fliesOneImage.pixel_data;
+		height = fliesOneImage.height;
+		width = fliesOneImage.width;
+	}  else if (id == 17) {
+		imagePtr=(short int *) fliesTwoImage.pixel_data;
+		height = fliesTwoImage.height;
+		width = fliesTwoImage.width;
+	}  else if (id == 18) {
+		imagePtr=(short int *) fliesThreeImage.pixel_data;
+		height = fliesThreeImage.height;
+		width = fliesThreeImage.width;
+	}  else if (id == 19) {
+		imagePtr=(short int *) fliesFourImage.pixel_data;
+		height = fliesFourImage.height;
+		width = fliesFourImage.width;
 	}
 	
 	Pixel *pixel;
@@ -291,7 +307,7 @@ void drawEndGame(int flag) {
 	pixel = malloc(sizeof(Pixel));
 	
 	int i=0;
-	for (int y = 0; y < SCREEN_HEIGHT; y++) { 
+	for (int y = 0; y < SCREEN_HEIGHT - 80; y++) { 
 		for (int x = 0; x < SCREEN_WIDTH; x++) {
 			pixel->color = imagePtr[i]; 
 			pixel->x = x;
@@ -465,48 +481,6 @@ void levelFourPlayDraw(char *fBuffer) {
 			pixel->x = x;
 			pixel->y = y;
 			writePixel(pixel, fBuffer);
-			i++;
-		}
-	}
-	/* free pixel's allocated memory */
-	free(pixel);
-	pixel = NULL;
-}
-
-void winDraw() {
-	short int *imagePtr=(short int *) winnerImage.pixel_data;
-	/* initialize a pixel */
-	Pixel *pixel;
-	pixel = malloc(sizeof(Pixel));
-	
-	int i=0;
-	for (int y = 0; y < 720; y++) { 
-		for (int x = 0; x < 1280; x++) {
-			pixel->color = imagePtr[i]; 
-			pixel->x = x;
-			pixel->y = y;
-			drawPixel(pixel);
-			i++;
-		}
-	}
-	/* free pixel's allocated memory */
-	free(pixel);
-	pixel = NULL;
-}
-
-void loseDraw() {
-	short int *imagePtr=(short int *) gameOverImage.pixel_data;
-	/* initialize a pixel */
-	Pixel *pixel;
-	pixel = malloc(sizeof(Pixel));
-	
-	int i=0;
-	for (int y = 0; y < 720; y++) { 
-		for (int x = 0; x < 1280; x++) {
-			pixel->color = imagePtr[i]; 
-			pixel->x = x;
-			pixel->y = y;
-			drawPixel(pixel);
 			i++;
 		}
 	}
