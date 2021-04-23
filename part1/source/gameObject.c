@@ -352,6 +352,7 @@ void updateLocation(struct object *o) {
 /* 
 * Updates the location of the given object based on direction, current location, and speed.
 * @param *o: The object to update.
+* @param level: The current game level.
 * @return: none.
 */
 void setObjects(int level, struct gameState *g) {

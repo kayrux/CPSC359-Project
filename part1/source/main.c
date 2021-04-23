@@ -228,7 +228,8 @@ void renderObject(struct object *o) {
 }
 
 /*
-* Render a particular screen image for a particular level.
+* Render a the screen image based on the current player level.
+* Render the objects and valuepacks at a calculated position.
 * @param: none
 * @return: none
 */
@@ -337,7 +338,7 @@ void update() {
 /*
 * The game loop. Runs all the main processes.
 * @param *p: a filler arguement
-* @return: zero
+* @return: none
 */
 void *gameLoop(void *p) {
     while (g.run) {
@@ -357,7 +358,7 @@ void *gameLoop(void *p) {
 /*
 * The input loop. Continuously updates the buttons the user has pressed.
 * @param *p: a filler arguement
-* @return: zero
+* @return: none
 */
 void *input(void *p) {
     int oldButtons[16];
