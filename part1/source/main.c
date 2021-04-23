@@ -307,7 +307,10 @@ void updateFrog() {
 
 /*
 * Reduces the remaining number of frog lives
+<<<<<<< HEAD
+=======
 * Decreases the frog lives by 1.
+>>>>>>> f240fc90d226ea6c07f5aa7859b4dc1d8e585c4f
 * @param: none
 * @return: none
 */
@@ -426,7 +429,7 @@ void pauseMenu() {
 }
 
 /*
-* Draw the main menu and check to see the user input to decide if the player should start the game
+* Draws the main menu and check to see the user input to decide if the player should start the game
 * or quit the game.
 * @param: none
 * @return: none
