@@ -227,6 +227,11 @@ void renderObject(struct object *o) {
     drawCar1(o->xCellOff, o->yCellOff, o->xOffset, o->xStart, g.gameMap, o->id);
 }
 
+/*
+* Render a particular screen image for a particular level.
+* @param: none
+* @return: none
+*/
 void render() {
     if(g.level == 1) {
         if(g.next == 1) {
@@ -302,6 +307,10 @@ void updateFrog() {
 
 /*
 * Reduces the remaining number of frog lives
+<<<<<<< HEAD
+=======
+* Decreases the frog lives by 1.
+>>>>>>> f240fc90d226ea6c07f5aa7859b4dc1d8e585c4f
 * @param: none
 * @return: none
 */
@@ -462,7 +471,11 @@ void mainMenu() {
 }
 
 
-
+/*
+* Initialize the game, create the threads, and run the game loop.
+* @param: none
+* @return: 0
+*/
 int main() {
     srand(time(0));
     initGameState();

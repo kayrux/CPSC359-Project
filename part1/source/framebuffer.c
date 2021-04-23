@@ -62,5 +62,4 @@ struct fbs initFbInfo(void)
         (float) screensize};
     
     return result;
-
 }
