@@ -71,7 +71,6 @@ struct object initValuePack(int num) {
     } else {
         o.spawnTime = rand() % 170 + 25;            // When the object spawns
     }
-    printf("Spawn time: %d\n", o.spawnTime);
     return o;
 }
 
@@ -244,8 +243,6 @@ void updateFrogLocation(int buttonPress, struct gameState *g) {
 int checkCollision(struct object *o, struct object *frog) {
     if ((o->xOffset < frog->xOffset + frog->width) &&
         (o->xOffset + o->width > frog->xOffset)) {
-            
-            printf("Collision! Object: (%d, %d), Frog(%d, %d)\n", o->xOffset, o->yOffset, frog->xOffset, frog->yOffset);
             return 1;
     }
     return 0;
@@ -272,7 +269,6 @@ int updateObjects(struct gameState *g) {
             updateLocation(&g->objects[i]);
             if ((g->objects[i].platform) && (g->objects[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if(frogOnPlatform(&g->objects[i], &g->objects[0], g->level) == 0){
-                    printf("%d\n", g->objects[0].yCellOff);
                      if(g->objects[0].yCellOff%2 != 1 && g->level == 2) {
                         if(g->objects[0].yCellOff != 19 && g->objects[0].yCellOff != 0) {
                             resetFrogLocation(&g->objects[0]);
@@ -301,10 +297,6 @@ int updateObjects(struct gameState *g) {
             if ((g->valuePacks[i].collidable == 1) && (g->valuePacks[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if (checkCollision(&g->valuePacks[i], &g->objects[0]) == 1) {
                     g->valuePacks[i].active = 0;
-                    printf("SCORE: %d\n", g->score);
-                    g->score += 1000;
-                    printf("ADDDDDD\n");
-                    printf("SCORE: %d\n", g->score);
                 }
             }
         }  
@@ -357,7 +349,6 @@ void setObjects(int level, struct gameState *g) {
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
             g->objects[i].collidable = 1;
-            printf("collidable\n");
             g->objects[i].platform = 0;
         }
         for (int i = 0; i < NUM_VALUE_PACKS; i++) {

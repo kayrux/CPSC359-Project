@@ -53,8 +53,6 @@ void init_GPIO(unsigned int *gpioPtr, int lineNum, int function) {
         INP_GPIO(gpioPtr, lineNum);
     } else if (function == 1) {
         OUT_GPIO(gpioPtr, lineNum);
-    } else {
-        printf("Invalid entry");
     }
 }
 
@@ -113,6 +111,11 @@ void initGameState() {
     g.gameMap = malloc(1280 * 720 * 2);
 }
 
+/*
+* Set the game's state and changing values to the initial base state.
+* @param: none
+* @return: none
+*/
 void resetGameState() {
     for(int i = 1; i < NUM_OBJECTS; i++) {
         g.objects[i] = initObject();
@@ -133,9 +136,13 @@ void resetGameState() {
     initTime();
 }
 
+/*
+* Draws the game over screen and waits until an input is recieved before going to main menu.
+* @param: none
+* @return: none
+*/
 void gameOver() {
     int btnPressed = 0;
-    printf("GAME OVER\n");
     g.lose = 1;
     g.pause = 1;
     drawEndGame(0);
@@ -147,9 +154,13 @@ void gameOver() {
     }
 }
 
+/*
+* Draws the winner screen and waits until an input is recieved before going to main menu.
+* @param: none
+* @return: none
+*/
 void gameWon() {
     int btnPressed = 0;
-    printf("GAME WON\n");
     g.win = 1;
     g.pause = 1;
     drawEndGame(1);
@@ -161,18 +172,39 @@ void gameWon() {
     }
 }
 
+/*
+* Checks the game state to confirm whether or not the game should end in a loss. (For cases like out of time
+* or out of lives.)
+* @param: none
+* @return: none
+*/
 void checkLoseCondition() {
     if (g.moves <= 0 || g.lives <= 0 || g.score <= 0 || g.time >= TIME_LIMIT) gameOver();
 }
 
+/*
+* Checks the game state to confirm whether or not the game should end in a win. (For cases like reaching the end.)
+* @param: none
+* @return: none
+*/
 void checkWinCondition() {
     if(g.level == 5) gameWon();
 }
 
+/*
+* Calculate the current game score and store the result in the gamestate.
+* @param: none
+* @return: none
+*/
 void updateScore() {
      g.score = ((TIME_LIMIT - g.time) + g.moves + g.lives) * SCORE_CONSTANT;
 }
 
+/*
+* Track the amount of time the player has remaining and store the changes as time passes.
+* @param: none
+* @return: none
+*/
 void updateTime() {
     if ((time(0) - g.sTime) >= 1) {
         g.time ++;
@@ -183,6 +215,11 @@ void updateTime() {
     }
 }
 
+/*
+* Updates the frog's position based on the arrow buttons.
+* @param: none
+* @return: none
+*/
 void renderObject(struct object *o) {
     drawCar1(o->xCellOff, o->yCellOff, o->xOffset, o->xStart, g.gameMap, o->id);
 }
@@ -257,13 +294,21 @@ void updateFrog() {
     else if (getButtonPress(7) == 0) updateFrogLocation(3, &g);    // RIGHT
 }
 
+/*
+* Reduces the remaining number of frog lives
+* @param: none
+* @return: none
+*/
 void frogLifeLost() {
     g.lives -= 1;
-    printf("You have lost a life! Frog lives: %d\n", g.lives);
-    printf("Time taken: %ld seconds\n", g.time);
-    //initTime();         // reset timer
 }
 
+/*
+* Calls a multitude of update functions to update the time, frog, and checks the win and loss conditions.
+* It also checks if the game should be paused.
+* @param: none
+* @return: none
+*/
 void update() {
     int collision = updateObjects(&g);
     if (collision) {
@@ -283,7 +328,6 @@ void update() {
 * @return: zero
 */
 void *gameLoop(void *p) {
-    printf("Game start...\n");
     while (g.run) {
         while(g.pause) if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
         update();
@@ -326,22 +370,25 @@ void *input(void *p) {
     pthread_exit(NULL);
 }
 
+/*
+* Draw the pause menu and check to see the user input to decide if the player should restart the game
+* ,quit the game, or unpause the game.
+* @param: none
+* @return: none
+*/
 void pauseMenu() {
     restartGamePause(g.gameMap);
     int restartSelect = 1;                    // Begins with the start option selected.
     int exitSelect = 0;
     g.pause = 1;                            // Pause game
-    printf("Restart: Selected\n");
     while (g.pause) {
         if (getButtonPress(3) == 0) g.pause = 1 - g.pause;          //Pause/Resume game
         if ((getButtonPress(4) == 0) || (getButtonPress(5) == 0)) {   // 'Up' or 'Down' button pressed
             restartSelect = 1 - restartSelect;
             exitSelect = 1 - exitSelect;
             if (restartSelect == 1) {
-				printf("Restart Game: Selected\n");
 				restartGamePause(g.gameMap);
 			} else {
-				printf("Exit Game: Selected\n");
 				exitGamePause(g.gameMap);
 			}
             
@@ -349,7 +396,6 @@ void pauseMenu() {
         if (getButtonPress(8) == 0) {           // 'A' button pressed
             if (restartSelect == 1) {             // Start game
                 g.pause = 0;
-                printf("Game Restart!!!!!\n");
 				sleep(1);
 				levelOneLoadDraw();
 				sleep(2);
@@ -358,8 +404,6 @@ void pauseMenu() {
                 resetGameState();
                 // END TEST
             } else {                            // Quit game
-                //Maybe add some sort of bye message or comfirmation?
-                printf("Game Exit!!!!!\n");
                 clear();
                 g.run = 0;
                 g.pause = 0;
@@ -369,21 +413,24 @@ void pauseMenu() {
     }
 }
 
+/*
+* Draw the main menu and check to see the user input to decide if the player should start the game
+* or quit the game.
+* @param: none
+* @return: none
+*/
 void mainMenu() {
     drawStart();
     int startSelect = 1;                    // Begins with the start option selected.
     int quitSelect = 0;
     g.pause = 1;                            // Pause game
-    printf("Start: Selected\n");
     while (g.pause) {
         if ((getButtonPress(4) == 0) || (getButtonPress(5) == 0)) {   // 'Up' or 'Down' button pressed
             startSelect = 1 - startSelect;
             quitSelect = 1 - quitSelect;
             if (startSelect == 1) {
-				printf("Start Game: Selected\n");
 				mainMenuDrawStart();
 			} else {
-				printf("Quit Game: Selected\n");
 				mainMenuDrawExit();
 			}
             
@@ -391,7 +438,6 @@ void mainMenu() {
         if (getButtonPress(8) == 0) {           // 'A' button pressed
             if (startSelect == 1) {             // Start game
                 g.pause = 0;
-                printf("Game Start!!!!!\n");
 				sleep(1);
 				levelOneLoadDraw();
 				sleep(2);
@@ -400,7 +446,6 @@ void mainMenu() {
                 resetGameState();
                 // END TEST
             } else {                            // Quit game
-                printf("Game Quit!!!!!\n");
                 clear();
                 g.run = 0;
                 g.pause = 0;
@@ -412,11 +457,6 @@ void mainMenu() {
 
 
 
-/*
-* Request the user input through text, initialize button array and run read_SNES.
-* @param: none
-* @return: zero
-*/
 int main() {
     srand(time(0));
     initGameState();

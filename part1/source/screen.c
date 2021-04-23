@@ -497,7 +497,6 @@ void restartGamePause(char *fBuffer) {
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 	
 	int i=0;
 	for (int y = 160; y < 560; y++) {
@@ -519,7 +518,6 @@ void exitGamePause(char *fBuffer) {
 	/* initialize a pixel */
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
-	//printf("%f | %f | %f | %d | %d\n", res, length, width, offsetX, offsetY);
 	
 	int i=0;
 	for (int y = 160; y < 560; y++) {
