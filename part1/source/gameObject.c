@@ -318,7 +318,16 @@ int updateObjects(struct gameState *g) {
             if ((g->valuePacks[i].collidable == 1) && (g->valuePacks[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if (checkCollision(&g->valuePacks[i], &g->objects[0]) == 1) {
                     g->valuePacks[i].active = 0;
-                    g->bonusScore += 1000 * g->level;
+                    if(g->level == 1) {
+                        g->bonusScore += 1000 * g->level;
+                    } else if(g->level == 2) {
+                        g->time += 20;
+                    } else if(g->level == 3) {
+                        g->moves += 20;
+                    } else if(g->level == 4) {
+                        g->bonusScore += 1000 * g->level;
+                    }
+                    
                 }
             }
         }  
