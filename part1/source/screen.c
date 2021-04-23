@@ -286,7 +286,7 @@ void mainMenuDrawExit() {
 	int i=0;
 	for (int y = 0; y < 720; y++) { 
 		for (int x = 0; x < 1280; x++) {
-			pixel->color = imagePtr[i]; 
+			pixel->color = imagePtr[i];
 			pixel->x = x;
 			pixel->y = y;
 			drawPixel(pixel);

@@ -209,9 +209,6 @@ void render() {
             setObjects(g.level, &g);
             g.next = 0;
         }
-        for (int i = 0; i < NUM_OBJECTS; i++) {
-            
-        }
         levelTwoPlayDraw(g.gameMap);                                             // Level One Background
     }
     if(g.level == 3) {
