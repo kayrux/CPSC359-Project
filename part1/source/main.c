@@ -124,7 +124,7 @@ void resetGameState() {
     for (int i = 0; i < NUM_VALUE_PACKS; i++) {
         g.valuePacks[i] = initValuePack(i);
     }
-    setObjects(g.level, &g);
+    
     g.objects[0] = initFrog();
     
     g.win = 0;
@@ -134,7 +134,7 @@ void resetGameState() {
     g.lives = 4;
     g.level = 1;
     g.moves = MOVE_LIMIT;
-    
+    setObjects(g.level, &g);
     initTime();
 }
 
@@ -451,7 +451,7 @@ void mainMenu() {
                 g.pause = 0;
 				sleep(1);
 				levelOneLoadDraw();
-				sleep(2);
+				sleep(1);
 				levelOnePlayDraw(g.gameMap);
                 resetGameState();
             } else {                            // Quit game

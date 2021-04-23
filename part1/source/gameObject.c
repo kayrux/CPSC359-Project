@@ -387,6 +387,9 @@ void setObjects(int level, struct gameState *g) {
             if(i%2 == 1) {
                 g->objects[i].active = 0;
             }
+            if(g->objects[i].yCellOff == 1 || g->objects[i].yCellOff == 2) {
+                g->objects[i].id = 9;
+            }
             g->objects[i].platform = 1;
             g->objects[i].collidable = 0;
             g->objects[i].active = 1;
@@ -405,9 +408,7 @@ void setObjects(int level, struct gameState *g) {
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
             g->objects[i].width = getWidth(g->objects[i].id, level);
-            if(g->objects[i].yCellOff == 1 || g->objects[i].yCellOff == 2) {
-                g->objects[i].id = 9;
-            }
+            
         }
         
         for (int i = 0; i < NUM_VALUE_PACKS; i++) {
@@ -424,6 +425,9 @@ void setObjects(int level, struct gameState *g) {
             } else {
                 g->objects->platform = 0;
                 g->objects[i].collidable = 0;
+            }
+            if(i >= 10) {
+                g->objects[i].id = 9;
             }
             
             g->objects[i].active = 1;
