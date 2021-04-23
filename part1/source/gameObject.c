@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#define NUM_VALUE_PACKS 4
+#define NUM_VALUE_PACKS 6
 #define NUM_OBJECTS 19
 
 #define GAME_GRID_WIDTH 40
@@ -35,6 +35,7 @@ struct gameState {
 	int run;
     int pause;
     int score;
+    int bonusScore;
     int lives;
     int level;
     int moves;
@@ -301,10 +302,7 @@ int updateObjects(struct gameState *g) {
             if ((g->valuePacks[i].collidable == 1) && (g->valuePacks[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if (checkCollision(&g->valuePacks[i], &g->objects[0]) == 1) {
                     g->valuePacks[i].active = 0;
-                    printf("SCORE: %d\n", g->score);
-                    g->score += 1000;
-                    printf("ADDDDDD\n");
-                    printf("SCORE: %d\n", g->score);
+                    g->bonusScore += 1000 * g->level;
                 }
             }
         }  
@@ -357,7 +355,6 @@ void setObjects(int level, struct gameState *g) {
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
             g->objects[i].collidable = 1;
-            printf("collidable\n");
             g->objects[i].platform = 0;
         }
         for (int i = 0; i < NUM_VALUE_PACKS; i++) {

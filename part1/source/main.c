@@ -29,7 +29,7 @@
 #define GPCLR0	10          //clear data line
 
 
-#define NUM_VALUE_PACKS 4
+#define NUM_VALUE_PACKS 6
 #define NUM_OBJECTS 19
 
 #define GAME_GRID_WIDTH 40
@@ -91,6 +91,7 @@ void initGameState() {
     g.win = 0;
     g.lose = 0;
     g.score = 0;
+    g.bonusScore = 0;
     g.lives = 4;
     g.level = 1;
     g.moves = MOVE_LIMIT;
@@ -126,6 +127,7 @@ void resetGameState() {
     g.win = 0;
     g.lose = 0;
     g.score = 0;
+    g.bonusScore = 0;
     g.lives = 4;
     g.level = 1;
     g.moves = MOVE_LIMIT;
@@ -171,6 +173,7 @@ void checkWinCondition() {
 
 void updateScore() {
      g.score = ((TIME_LIMIT - g.time) + g.moves + g.lives) * SCORE_CONSTANT;
+     g.score += g.bonusScore;
 }
 
 void updateTime() {
@@ -234,7 +237,10 @@ void render() {
         if (g.objects[i].active == 1) {renderObject(&g.objects[i]);}  // render Object based on id
     }
     for (int i = 0; i < NUM_VALUE_PACKS; i++) {
-        if (g.valuePacks[i].active == 1) {renderObject(&g.valuePacks[i]);}  // render Value Pack based on id
+        if (g.valuePacks[i].active == 1) {
+            g.valuePacks[i].id = g.level + 15; // render Value Pack based on id
+            renderObject(&g.valuePacks[i]);
+        }  
     }
     drawFrog(g.objects[0].xOffset, g.objects[0].yCellOff, g.gameMap);         // Draw frog
     if (g.lives < 4) coverFrogLives(g.gameMap, g.lives);
@@ -257,11 +263,15 @@ void updateFrog() {
     else if (getButtonPress(7) == 0) updateFrogLocation(3, &g);    // RIGHT
 }
 
+/*
+* Decreases the frog lives by 1.
+* @param: none
+* @return: none
+*/
 void frogLifeLost() {
     g.lives -= 1;
     printf("You have lost a life! Frog lives: %d\n", g.lives);
     printf("Time taken: %ld seconds\n", g.time);
-    //initTime();         // reset timer
 }
 
 void update() {
