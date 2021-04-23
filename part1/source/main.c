@@ -90,6 +90,7 @@ void initGameState() {
     g.win = 0;
     g.lose = 0;
     g.score = 0;
+    g.bonusScore = 0;
     g.lives = 4;
     g.level = 1;
     g.moves = MOVE_LIMIT;
@@ -125,6 +126,7 @@ void resetGameState() {
     g.win = 0;
     g.lose = 0;
     g.score = 0;
+    g.bonusScore = 0;
     g.lives = 4;
     g.level = 1;
     g.moves = MOVE_LIMIT;
@@ -170,6 +172,7 @@ void checkWinCondition() {
 
 void updateScore() {
      g.score = ((TIME_LIMIT - g.time) + g.moves + g.lives) * SCORE_CONSTANT;
+     g.score += g.bonusScore;
 }
 
 void updateTime() {

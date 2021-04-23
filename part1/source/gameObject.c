@@ -35,6 +35,7 @@ struct gameState {
 	int run;
     int pause;
     int score;
+    int bonusScore;
     int lives;
     int level;
     int moves;
@@ -284,7 +285,7 @@ int updateObjects(struct gameState *g) {
                 if (checkCollision(&g->valuePacks[i], &g->objects[0]) == 1) {
                     g->valuePacks[i].active = 0;
                     printf("SCORE: %d\n", g->score);
-                    g->score += 1000;
+                    g->bonusScore += 1000;
                     printf("ADDDDDD\n");
                     printf("SCORE: %d\n", g->score);
                 }
