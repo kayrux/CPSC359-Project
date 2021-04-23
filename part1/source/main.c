@@ -420,7 +420,7 @@ void pauseMenu() {
 }
 
 /*
-* Draw the main menu and check to see the user input to decide if the player should start the game
+* Draws the main menu and check to see the user input to decide if the player should start the game
 * or quit the game.
 * @param: none
 * @return: none

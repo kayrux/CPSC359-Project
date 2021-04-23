@@ -80,7 +80,10 @@ typedef struct {
 	int x, y;
 } Pixel;
 
-
+/* Checks if the x-offset is out of the screen.
+* @param xOffset: the x-offset.
+* @return: 1 if the object is out of bounds. 0 otherwise.
+*/
 int outOfBounds(int xOffset) {
 	if ((xOffset > SCREEN_WIDTH) || (xOffset < 0)) return 1;
 	return 0;
@@ -90,6 +93,10 @@ struct fbs framebufferstruct;
 void drawPixel(Pixel *pixel);
 void writePixel(Pixel *pixel, char *fBuffer);
 
+/* Clears the screen by filling it with black pixels.
+* @param: none
+* @return: none
+*/
 void clear() {
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
@@ -110,6 +117,12 @@ void clear() {
 	pixel = NULL;
 }
 
+/* Draws the frog onto the frame buffer.
+* @param xOffset: the x-pixel coordinate of the frog.
+* @param yOffset: the y-pixel coordinate of the frog.
+* @param fBuffer: the intermediate frame buffer for the game.
+* @return: none
+*/
 void drawFrog(int xOffset, int yCellOff, char *fBuffer) {
 	short int *imagePtr=(short int *) ImageFrogUpBase.pixel_data;
 	Pixel *pixel;
@@ -130,6 +143,15 @@ void drawFrog(int xOffset, int yCellOff, char *fBuffer) {
 	pixel = NULL;
 }
 
+/* Draws an object onto the frame buffer. The object drawn is based on id.
+* @param xCellOff: the x-cell coordinate of the object.
+* @param yCellOff: the y-cell coordinate of the object.
+* @param xOffset: the x-pixel coordinate of the object.
+* @param xStart: the number of x-pixel offset into the out of bounds area.
+* @param fBuffer: the intermediate frame buffer for the game.
+* @param id: the object id.
+* @return: none
+*/
 void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer, int id) {
 	short int *imagePtr=(short int *) ImageCar3RightBaseClear.pixel_data;
 	int height = 32;
@@ -233,6 +255,10 @@ void drawCar1(int xCellOff, int yCellOff, int xOffset, int xStart, char *fBuffer
 	pixel = NULL;
 }
 
+/* Draws the start screen
+* @param: none
+* @return: none
+*/
 void drawStart() {
 	short int *imagePtr=(short int *) startImage.pixel_data;
 	
@@ -255,7 +281,10 @@ void drawStart() {
 	pixel = NULL;
 }
 
-
+/* Draws the menu screen with the "start" button highlighted.
+* @param: none
+* @return: none
+*/
 void mainMenuDrawStart() {
 	short int *imagePtr=(short int *) startImage.pixel_data;
 	/* initialize a pixel */
@@ -277,6 +306,10 @@ void mainMenuDrawStart() {
 	pixel = NULL;
 }
 
+/* Draws the menu screen with the "Exit" button highlighted.
+* @param: none
+* @return: none
+*/
 void mainMenuDrawExit() {
 	short int *imagePtr=(short int *) exitImage.pixel_data;
 	/* initialize a pixel */
@@ -298,6 +331,10 @@ void mainMenuDrawExit() {
 	pixel = NULL;
 }
 
+/* Draws either the "Game Over" or the "Game Won" screen based on the flag.
+* @param flag: The flag is set to 0 for game over. 1 otherwise.
+* @return: none
+*/
 void drawEndGame(int flag) {
 	short int *imagePtr;
 	if (flag == 0) imagePtr = (short int *) gameOverImage.pixel_data;
@@ -321,6 +358,10 @@ void drawEndGame(int flag) {
 	pixel = NULL;
 }
 
+/* Draws the level one transition image onto the screen.
+* @param: none
+* @return: none
+*/
 void levelOneLoadDraw() {
 	short int *imagePtr=(short int *) levelOneIntroImage.pixel_data;
 	/* initialize a pixel */
