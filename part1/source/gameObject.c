@@ -273,19 +273,19 @@ int updateObjects(struct gameState *g) {
             if ((g->objects[i].platform) && (g->objects[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if(frogOnPlatform(&g->objects[i], &g->objects[0], g->level) == 0){
                     printf("%d\n", g->objects[0].yCellOff);
-                     /* if(g->objects[0].yCellOff%2 != 1 && g->level == 2) {
+                     if(g->objects[0].yCellOff%2 != 1 && g->level == 2) {
                         if(g->objects[0].yCellOff != 19 && g->objects[0].yCellOff != 0) {
                             resetFrogLocation(&g->objects[0]);
                             return 1;
                         }
-                    } */
+                    }
                     if((g->objects[0].yCellOff == 18 || g->objects[0].yCellOff == 17 || g->objects[0].yCellOff == 15 || g->objects[0].yCellOff == 14
                     || g->objects[0].yCellOff == 12 || g->objects[0].yCellOff == 11)  && g->level == 3) {
                         if(g->objects[0].yCellOff != 19 && g->objects[0].yCellOff != 0) {
                             resetFrogLocation(&g->objects[0]);
                             return 1;
                         }
-                    } 
+                    }
                 }
             }
             if ((g->objects[i].collidable == 1) && (g->objects[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
@@ -391,7 +391,11 @@ void setObjects(int level, struct gameState *g) {
             g->objects[i].yCellOff = i;
             g->objects[i].yOffset = i * Y_CELL_PIXEL_SCALE;
             g->objects[i].width = getWidth(g->objects[i].id, level);
+            if(g->objects[i].yCellOff == 1 || g->objects[i].yCellOff == 2) {
+                g->objects[i].id = 9;
+            }
         }
+        
         for (int i = 0; i < NUM_VALUE_PACKS; i++) {
             g->valuePacks[i] = initValuePack(i);
         }
@@ -399,7 +403,7 @@ void setObjects(int level, struct gameState *g) {
 
     if (level == 3) {
         for (int i = 1; i < NUM_OBJECTS; i++) {
-            if(g->objects[i].id > 6 && i <= 10) {
+            if(g->objects[i].id >= 6 && i <= 10) {
                 g->objects[i].id = g->objects[i].id - 5;
                 g->objects->platform = 1;
                 g->objects[i].collidable = 1;
