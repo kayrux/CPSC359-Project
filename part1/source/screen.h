@@ -31,5 +31,8 @@ void renderScreen(char *gameMap);
 void restartGamePause(char *fBuffer);
 void exitGamePause(char *fBuffer);
 void drawEndGame(int flag);
+void getDigits(int number, int *digits);
+void drawDigit(int xOffset, int yOffset, int n, int colour, char *fBuffer);
+void drawDisplay(int displayId, int number, char *fBuffer);
 
 #endif

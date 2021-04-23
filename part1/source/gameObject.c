@@ -283,7 +283,10 @@ int updateObjects(struct gameState *g) {
             if ((g->valuePacks[i].collidable == 1) && (g->valuePacks[i].yOffset == g->objects[0].yOffset)) {      // Checks collidable objects for a collision
                 if (checkCollision(&g->valuePacks[i], &g->objects[0]) == 1) {
                     g->valuePacks[i].active = 0;
-                    g->score += 200;
+                    printf("SCORE: %d\n", g->score);
+                    g->score += 1000;
+                    printf("ADDDDDD\n");
+                    printf("SCORE: %d\n", g->score);
                 }
             }
         }  

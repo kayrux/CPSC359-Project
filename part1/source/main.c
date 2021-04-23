@@ -237,7 +237,9 @@ void render() {
     }
     drawFrog(g.objects[0].xOffset, g.objects[0].yCellOff, g.gameMap);         // Draw frog
     if (g.lives < 4) coverFrogLives(g.gameMap, g.lives);
-    coverTimeBar(g.gameMap, g.time);
+    drawDisplay(0, TIME_LIMIT - g.time, g.gameMap);
+    drawDisplay(1, g.score, g.gameMap);
+    drawDisplay(2, g.moves, g.gameMap);
     renderScreen(g.gameMap);
 }
 
@@ -417,7 +419,6 @@ void mainMenu() {
 int main() {
     srand(time(0));
     initGameState();
-
     pthread_t tidGameLoop;
     pthread_t tidInput;
 	pthread_attr_t attr;

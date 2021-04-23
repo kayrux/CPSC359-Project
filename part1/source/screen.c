@@ -64,6 +64,12 @@
 #define TIME_LIMIT 180
 #define TIME_SEGMENT (TIME_BAR_WIDTH / TIME_LIMIT)
 
+// Display bar
+#define DISPLAY_BAR_Y 670
+#define TOP_LEFT_TIME_DIGIT_X 365
+#define TOP_LEFT_SCORE_DIGIT_X 718
+#define TOP_LEFT_MOVES_DIGIT_X 1168
+
 /* Definitions */
 typedef struct {
 	int color;
@@ -599,6 +605,74 @@ void coverFrogLives(char *fBuffer, int frogLives) {
 				writePixel(pixel, fBuffer);
 				i++;	
 		}
+	}
+}
+
+/**
+ * Colour id: Yellow = 0, Blue = 1, Red = 2
+ */
+void drawDigit(int xOffset, int yOffset, int n, int colour, char *fBuffer) {
+	short int *imagePtr=(short int *) numberMapImage.pixel_data;
+	Pixel *pixel;
+	pixel = malloc(sizeof(Pixel));
+	int numCol = 10 * X_CELL_PIXEL_SCALE;
+	int row = 0;
+	int col = 0;
+
+	int i= 0;
+	for (int y = 0; y < Y_CELL_PIXEL_SCALE; y++) {
+		row = colour * Y_CELL_PIXEL_SCALE + y;
+		for (int x = 0; x < X_CELL_PIXEL_SCALE; x++) {
+			col = n * X_CELL_PIXEL_SCALE + x;
+			i = row * numCol + col;
+			pixel->color = imagePtr[i];
+			pixel->x = x + xOffset;
+			pixel->y = y + yOffset;
+
+			writePixel(pixel, fBuffer);
+			i++;	
+		}
+	}
+	free(pixel);
+	pixel = NULL;
+}
+
+void getDigits(int number, int *digits) {
+	// Stores digits with the one's unit at index 0.
+	for (int i = 0; i < 5; i ++) {
+		digits[i] = number % 10;
+		number = number / 10;
+	}
+}
+/**
+ * Display id: Time = 0, Score = 1, Moves = 3
+ */ 
+void drawDisplay(int displayId, int number, char *fBuffer) {
+	int digits[5];
+	int cellOffset;
+	getDigits(number, digits);
+	switch (displayId) {
+		case 0:
+			cellOffset = 2;
+			for (int i = 0; i < 3; i ++) {
+				drawDigit(TOP_LEFT_TIME_DIGIT_X + (cellOffset * X_CELL_PIXEL_SCALE), DISPLAY_BAR_Y, digits[i], displayId, fBuffer);
+				cellOffset --;
+			}
+			break;
+		case 1:
+			cellOffset = 4;
+			for (int i = 0; i < 5; i ++) {
+				drawDigit(TOP_LEFT_SCORE_DIGIT_X + (cellOffset * X_CELL_PIXEL_SCALE), DISPLAY_BAR_Y, digits[i], displayId, fBuffer);
+				cellOffset --;
+			}
+			break;
+		case 2:
+			cellOffset = 1;
+			for (int i = 0; i < 3; i ++) {
+				drawDigit(TOP_LEFT_MOVES_DIGIT_X + (cellOffset * X_CELL_PIXEL_SCALE), DISPLAY_BAR_Y, digits[i], displayId, fBuffer);
+				cellOffset --;
+			}
+			break;
 	}
 }
 
