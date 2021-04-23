@@ -1,4 +1,5 @@
 /*
+* Frame buffer code taken from TA Abed.
 * Modified from http://cep.xray.aps.anl.gov/software/qt4-x11-4.2.2/qtopiacore-testingframebuffer.html
 * for the purpose of assignment 4 CPSC359 P19
 */
@@ -12,6 +13,10 @@
 #include <sys/ioctl.h>
 #include "framebuffer.h"
 
+/* initializes the frame buffer.
+* @param: none
+* @return: none
+*/
 struct fbs initFbInfo(void)
 {
     int fbfd = 0;
@@ -26,7 +31,7 @@ struct fbs initFbInfo(void)
         perror("Error: cannot open framebuffer device");
         exit(1);
     }
-    printf("The framebuffer device was opened successfully.\n");
+    //printf("The framebuffer device was opened successfully.\n");
 
     // Get fixed screen information
     if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1) {
@@ -54,8 +59,8 @@ struct fbs initFbInfo(void)
         exit(4);
     }
     
-    printf("The framebuffer device was mapped to memory successfully.\n");
-    printf("%dx%d, %dbpp\n", vinfo.xoffset, vinfo.yoffset, vinfo.bits_per_pixel);
+    //printf("The framebuffer device was mapped to memory successfully.\n");
+    //printf("%dx%d, %dbpp\n", vinfo.xoffset, vinfo.yoffset, vinfo.bits_per_pixel);
     
     struct fbs result = {(char *)fbp, (int) vinfo.xoffset, (int) vinfo.yoffset,
         (int) vinfo.bits_per_pixel, (int) finfo.line_length,

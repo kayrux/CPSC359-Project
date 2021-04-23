@@ -26,7 +26,6 @@ void levelThreePlayDraw(char *gameMap);
 void levelFourLoadDraw();
 void levelFourPlayDraw(char *gameMap);
 void coverFrogLives(char *fBuffer, int frogLives);
-void coverTimeBar(char *fBuffer, int time);
 void renderScreen(char *gameMap);
 void restartGamePause(char *fBuffer);
 void exitGamePause(char *fBuffer);
