@@ -383,6 +383,10 @@ void levelOneLoadDraw() {
 	pixel = NULL;
 }
 
+/* Draws the level one background image onto the screen.
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void levelOnePlayDraw(char *fBuffer) {
 	short int *imagePtr=(short int *) levelOneImage.pixel_data;
 	/* initialize a pixel */
@@ -404,6 +408,10 @@ void levelOnePlayDraw(char *fBuffer) {
 	pixel = NULL;
 }
 
+/* Draws the level two transition image onto the screen.
+* @param: none
+* @return: none
+*/
 void levelTwoLoadDraw() {
 	short int *imagePtr=(short int *) levelTwoIntroImage.pixel_data;
 	/* initialize a pixel */
@@ -425,6 +433,10 @@ void levelTwoLoadDraw() {
 	pixel = NULL;
 }
 
+/* Draws the level two background image onto the screen.
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void levelTwoPlayDraw(char *fBuffer) {
 	short int *imagePtr=(short int *) levelTwoImage.pixel_data;
 	/* initialize a pixel */
@@ -446,6 +458,10 @@ void levelTwoPlayDraw(char *fBuffer) {
 	pixel = NULL;
 }
 
+/* Draws the level three transition image onto the screen.
+* @param: none
+* @return: none
+*/
 void levelThreeLoadDraw() {
 	short int *imagePtr=(short int *) levelThreeIntroImage.pixel_data;
 	/* initialize a pixel */
@@ -467,6 +483,10 @@ void levelThreeLoadDraw() {
 	pixel = NULL;
 }
 
+/* Draws the level three background image onto the screen.
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void levelThreePlayDraw(char *fBuffer) {
 	short int *imagePtr=(short int *) levelThreeImage.pixel_data;
 	/* initialize a pixel */
@@ -488,6 +508,10 @@ void levelThreePlayDraw(char *fBuffer) {
 	pixel = NULL;
 }
 
+/* Draws the level four transition image onto the screen.
+* @param: none
+* @return: none
+*/
 void levelFourLoadDraw() {
 	short int *imagePtr=(short int *) levelFourIntroImage.pixel_data;
 	/* initialize a pixel */
@@ -509,6 +533,10 @@ void levelFourLoadDraw() {
 	pixel = NULL;
 }
 
+/* Draws the level four background image onto the screen.
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void levelFourPlayDraw(char *fBuffer) {
 	short int *imagePtr=(short int *) levelFourImage.pixel_data;
 	/* initialize a pixel */
@@ -530,7 +558,7 @@ void levelFourPlayDraw(char *fBuffer) {
 	pixel = NULL;
 }
 
-void coverTimeBar(char *fBuffer, int time) {
+/* void coverTimeBar(char *fBuffer, int time) {
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
 	if (time < 0) time = 0;
@@ -547,8 +575,12 @@ void coverTimeBar(char *fBuffer, int time) {
 				i++;	
 		}
 	}
-}
+} */
 
+/* Draws the pause menu with the restart button highlighted.
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void restartGamePause(char *fBuffer) {
 	short int *imagePtr=(short int *) pauseRestartImage.pixel_data;
 	/* initialize a pixel */
@@ -570,6 +602,10 @@ void restartGamePause(char *fBuffer) {
 	pixel = NULL;
 }
 
+/* Draws the pause menu with the exit button highlighted.
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void exitGamePause(char *fBuffer) {
 	short int *imagePtr=(short int *) pauseExitImage.pixel_data;
 	/* initialize a pixel */
@@ -591,6 +627,11 @@ void exitGamePause(char *fBuffer) {
 	pixel = NULL;
 }
 
+/* Covers up the frog lives images based on number of remaining lives.
+* @param fBuffer: the intermediate frame buffer.
+* @param ffrogLives: the number of remaining lives left.
+* @return: none
+*/
 void coverFrogLives(char *fBuffer, int frogLives) {
 	Pixel *pixel;
 	pixel = malloc(sizeof(Pixel));
@@ -621,9 +662,15 @@ void coverFrogLives(char *fBuffer, int frogLives) {
 	}
 }
 
-/**
- * Colour id: Yellow = 0, Blue = 1, Red = 2
- */
+/* Draws a digit onto the frame buffer.
+* Colour id: Yellow = 0, Blue = 1, Red = 2
+* @param xOffset: the x-pixel coordinate of the digit
+* @param yOffset: the y-pixel coordinate of the digit
+* @param n: the digit to draw.
+* @param colour: the id of the colour to draw.
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void drawDigit(int xOffset, int yOffset, int n, int colour, char *fBuffer) {
 	short int *imagePtr=(short int *) numberMapImage.pixel_data;
 	Pixel *pixel;
@@ -650,6 +697,11 @@ void drawDigit(int xOffset, int yOffset, int n, int colour, char *fBuffer) {
 	pixel = NULL;
 }
 
+/* Gets the digits of a given number and stores them in reverse order into an array.
+* @param number: the number to get the digits from.
+* @param *digits: the int array which stores the digits.
+* @return: none
+*/
 void getDigits(int number, int *digits) {
 	// Stores digits with the one's unit at index 0.
 	for (int i = 0; i < 5; i ++) {
@@ -657,9 +709,14 @@ void getDigits(int number, int *digits) {
 		number = number / 10;
 	}
 }
-/**
- * Display id: Time = 0, Score = 1, Moves = 3
- */ 
+
+/* Draws one of time, score or moves onto the frame buffer based on
+* Display id: Time = 0, Score = 1, Moves = 2
+* @param displayId: the id of the desired display drawn. 
+* @param number: the score, time or moves left.
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void drawDisplay(int displayId, int number, char *fBuffer) {
 	int digits[5];
 	int cellOffset;
@@ -689,19 +746,31 @@ void drawDisplay(int displayId, int number, char *fBuffer) {
 	}
 }
 
+/* Writes a pixel onto the intermediate frame buffer.
+* @param *pixel: a pointer to the pixel. 
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void writePixel(Pixel *pixel, char *fBuffer) {
 	long int location =(pixel->x +framebufferstruct.xOff) * (framebufferstruct.bits/8) +
                        (pixel->y+framebufferstruct.yOff) * framebufferstruct.lineLength;
 	*((unsigned short int*)(fBuffer + location)) = pixel->color;
 }
 
-/* Draw a pixel */
+/* Draws a pixel onto the screen.
+* @param *pixel: a pointer to the pixel. 
+* @return: none
+*/
 void drawPixel(Pixel *pixel) {
 	long int location =(pixel->x +framebufferstruct.xOff) * (framebufferstruct.bits/8) +
                        (pixel->y+framebufferstruct.yOff) * framebufferstruct.lineLength;
 	*((unsigned short int*)(framebufferstruct.fptr + location)) = pixel->color;
 }
 
+/* Copies the frame buffer onto the screen.
+* @param fBuffer: the intermediate frame buffer.
+* @return: none
+*/
 void renderScreen(char *fBuffer) {
 	memcpy(framebufferstruct.fptr, fBuffer, 1280 * 720 * 2);
 }
