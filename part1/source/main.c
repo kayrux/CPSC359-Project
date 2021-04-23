@@ -301,21 +301,12 @@ void updateFrog() {
 }
 
 /*
-<<<<<<< HEAD
 * Reduces the remaining number of frog lives
-=======
-* Decreases the frog lives by 1.
->>>>>>> 3940cb89fd989a28fc57246a82d534a513058033
 * @param: none
 * @return: none
 */
 void frogLifeLost() {
     g.lives -= 1;
-<<<<<<< HEAD
-=======
-    printf("You have lost a life! Frog lives: %d\n", g.lives);
-    printf("Time taken: %ld seconds\n", g.time);
->>>>>>> 3940cb89fd989a28fc57246a82d534a513058033
 }
 
 /*
