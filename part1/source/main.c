@@ -308,10 +308,7 @@ void updateFrog() {
 
 /*
 * Reduces the remaining number of frog lives
-<<<<<<< HEAD
-=======
 * Decreases the frog lives by 1.
->>>>>>> f240fc90d226ea6c07f5aa7859b4dc1d8e585c4f
 * @param: none
 * @return: none
 */
@@ -416,9 +413,7 @@ void pauseMenu() {
 				levelOneLoadDraw();
 				sleep(2);
 				levelOnePlayDraw(g.gameMap);
-                // TEST CODE
                 resetGameState();
-                // END TEST
             } else {                            // Quit game
                 clear();
                 g.run = 0;
@@ -458,9 +453,7 @@ void mainMenu() {
 				levelOneLoadDraw();
 				sleep(2);
 				levelOnePlayDraw(g.gameMap);
-                // TEST CODE
                 resetGameState();
-                // END TEST
             } else {                            // Quit game
                 clear();
                 g.run = 0;
