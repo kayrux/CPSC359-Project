@@ -80,7 +80,12 @@ typedef struct {
 	int x, y;
 } Pixel;
 
-
+/*
+* Check the game screen and character position
+* to see if the player is within the bounds of the game.
+* @param: none
+* @return: 0, 1
+*/
 int outOfBounds(int xOffset) {
 	if ((xOffset > SCREEN_WIDTH) || (xOffset < 0)) return 1;
 	return 0;

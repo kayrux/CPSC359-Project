@@ -127,6 +127,12 @@ struct object initFrog() {
 
 void updateLocation(struct object *o);
 
+/*
+* Check the width of game objects depending on the object and level before returning the adjested width.
+* All heights and widths are some scale of 32px.
+* @param: id, level
+* @return: multiple of X_CELL_PIXEL_SCALE
+*/
 int getWidth(int id, int level) {
     if (level == 1) {
         if (id == 5 ) return X_CELL_PIXEL_SCALE * 2;
@@ -249,6 +255,14 @@ int checkCollision(struct object *o, struct object *frog) {
     return 0;
 }
 
+/*Checks to see if the frog is currently in contact with a gameobject that is set to be a platform.
+* If so, then have the frog move with the platform and return a value if it is on a platform in level
+* 2 or level 3/
+* @param *o: The first object.
+* @param *frog: The second object.
+* @param *level: The current level.
+* @return: 1 if on platform on level 2 or level 3. 0 if it is not on a platform on level 2 or level 3.
+*/
 int frogOnPlatform(struct object *o, struct object *frog, int level) {
     if ((o->xOffset + (X_CELL_PIXEL_SCALE / 2) < frog->xOffset + frog->width) &&
         ((o->xOffset + o-> width) - (X_CELL_PIXEL_SCALE / 2) > frog->xOffset)) {
@@ -264,6 +278,12 @@ int frogOnPlatform(struct object *o, struct object *frog, int level) {
     return 0;
 }
 
+/*Updates every object currently on the screen including the player, obstacles, bonus pack, and platforms.
+* This largely updates the location of all moving objects and restarts the player from specific points in the case
+* of death and moving up or down a level.
+* @param *g: The game state.
+* @return: 1 if the player will have lost a life bu collision or walking in the wrong place. 0 if there is no death.
+*/
 int updateObjects(struct gameState *g) {
     for (int i = 1; i < NUM_OBJECTS; i++) {
         if (g->objects[i].active == 1) {            // Updates the object if it is active
